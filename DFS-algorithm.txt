@@ -1,0 +1,17 @@
+Depth First Search Algorithm
+
+stack ← starting position of Sokoban
+depth ← 1 while stack is not empty do
+       if Are crates on target then
+              break
+       else
+
+              if Is deadlock or is time ≥ maxtimeout then
+                     increase the depth
+                     pick next solution
+              else
+                     Get valid moves for Sokoban
+                     foreach move do
+                            Find next state
+                            Put it in stack   
+return path
