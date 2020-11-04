@@ -122,24 +122,22 @@ def main():
                     for push in pushes:
                         sp = SearchPath(map)
                         sp.updateMapa(mapa, push)
-                        paths.append(sp)
+                        m =  sp.map
+                        paths.append(sp.__str__())
 
                     print(paths)
 
                     while not len(paths) == 0:
-                        sp = paths.pop(0)
+                        sp = paths.pop(0)  
 
-                        if complete(mapa, sp.map):
+                        if complete(mapa, m):
                             break
 
                         else:
-                            if is_deadlock(mapa, sp.map):
+                            if is_deadlock(mapa, m):
                                 break
-                        
-                    return sp.path
-                    
-
-                    
+  
+                    return sp
                     # print("\n")
                     # print(Map(f"levels/{state['level']}.xsb"))
 
