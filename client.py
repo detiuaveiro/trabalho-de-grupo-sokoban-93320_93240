@@ -61,10 +61,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 #             pprint.pprint(state)
                 #             print(Map(f"levels/{state['level']}.xsb"))
-                    await websocket.send(
-                        json.dumps({"cmd": "key", "key": key})
-                    )  # send key command to server - you must implement this send in the AI agent
-                        #break
+                await websocket.send(
+                    json.dumps({"cmd": "key", "key": key})
+                )  # send key command to server - you must implement this send in the AI agent
+                    #break
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
                 return
