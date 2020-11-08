@@ -1,29 +1,28 @@
 from mapa import Map
+import copy 
 from consts import Tiles, TILES
 import math
 
 class SearchPath:
-
     def __init__(self, map):
-        self._map = map
+        self._map = copy.deepcopy(map)
         self.path = []
 
     def pathBetween(self,keeper,move,mapa):
         x,y = move[0]
-        dirs = []
         #print(keeper)
         #destino do keeper
         if move[1] == 'w': #up
-            keeperDest = (x,y+1)      
+            keeperDest = (x,y+1)
         elif move[1] == 'd': #right
             keeperDest = (x+1,y)
         elif move[1] == 's':   #down
             keeperDest = (x,y-1)
         elif move[1] == 'a':   #left
             keeperDest = (x-1,y)
-        #print(keeperDest)
         #print("........")
-        
+        #print(keeperDest)      
+
         # xdest < xi
         while True:
             if keeperDest == keeper:
@@ -33,73 +32,73 @@ class SearchPath:
                     #print(mapa.get_tile((keeper[0], keeper[1]+1)))
                     if mapa.get_tile((keeper[0], keeper[1]+1)) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                         #print(keeper[0], keeper[1]+1)
-                        dirs.append('s')
+                        self.path.append('s')
                         keeper = (keeper[0], keeper[1]+1)
                 else:
                     #print(mapa.get_tile((keeper[0], keeper[1]-1)))
                     if mapa.get_tile((keeper[0], keeper[1]-1)) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                         #print(keeper[0], keeper[1]-1)
-                        dirs.append('w')
+                        self.path.append('w')
                         keeper = (keeper[0], keeper[1]-1)
             elif keeperDest[1] == keeper[1]:
                 if keeperDest[0] < keeper[0]:
                     #print(mapa.get_tile((keeper[0]-1, keeper[1])))
                     if mapa.get_tile((keeper[0]-1, keeper[1])) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                         #print(keeper[0]-1, keeper[1])
-                        dirs.append('a')
+                        self.path.append('a')
                         keeper = (keeper[0]-1, keeper[1])
                 else:
                     #print(mapa.get_tile((keeper[0]+1, keeper[1])))
                     if mapa.get_tile((keeper[0]+1, keeper[1])) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                         #print(keeper[0]+1, keeper[1])
-                        dirs.append('d')
+                        self.path.append('d')
                         keeper = (keeper[0]+1, keeper[1])
 
             elif keeperDest[0] < keeper[0]:
                 #print(mapa.get_tile((keeper[0]-1, keeper[1])))
                 if mapa.get_tile((keeper[0]-1, keeper[1])) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                     #print(keeper[0]-1, keeper[1])
-                    dirs.append('a')
+                    self.path.append('a')
                     keeper = (keeper[0]-1, keeper[1])
                 else:   #se n pode começar a mover para o lado certo tem q mover para cima/baixo
                     if keeperDest[1] > keeper[1]:
                         #print(mapa.get_tile((keeper[0], keeper[1]+1)))
                         if mapa.get_tile((keeper[0], keeper[1]+1)) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                             #print(keeper[0], keeper[1]+1)
-                            dirs.append('s')
+                            self.path.append('s')
                             keeper = (keeper[0], keeper[1]+1)
                     else:
                         #print(mapa.get_tile((keeper[0], keeper[1]-1)))
                         if mapa.get_tile((keeper[0], keeper[1]-1)) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                             #print(keeper[0], keeper[1]-1)
-                            dirs.append('w')
+                            self.path.append('w')
                             keeper = (keeper[0], keeper[1]-1)
             #se nao consegue mover pra cima/baixo, nem para o lado suposto deve 
             elif keeperDest[0] > keeper[0]:
                 #print(mapa.get_tile((keeper[0]+1, keeper[1])))
                 if mapa.get_tile((keeper[0]+1, keeper[1])) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                     #print(keeper[0]+1, keeper[1])
-                    dirs.append('d')
+                    self.path.append('d')
                     keeper = (keeper[0]+1, keeper[1])
                 else:   #se n pode começar a mover para os lados tem q mover para cima/baixo
                     if keeperDest[1] < keeper[1]:
                         #print(mapa.get_tile((keeper[0], keeper[1]-1)))
                         if mapa.get_tile((keeper[0], keeper[1]-1)) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                             #print(keeper[0], keeper[1]-1)
-                            dirs.append('w')
+                            self.path.append('w')
                             keeper = (keeper[0], keeper[1]-1)
                         else:
                             if mapa.get_tile((keeper[0], keeper[1]+1)) not in (Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL):
                                 #print(keeper[0], keeper[1]+1)
-                                dirs.append('s')
+                                self.path.append('s')
                                 keeper = (keeper[0], keeper[1]+1)
         
         #print(" ---- ")
         #print(keeper)
         print("caminho do keeper: ")
-        print(dirs)
+        print(self.path)
         #print(move)
-        return dirs
+        return self.path
 
     # def a_star_search(graph: WeightedGraph, start: Location, goal: Location):
     #     frontier = PriorityQueue()
@@ -138,8 +137,8 @@ class SearchPath:
     def updateMapa(self, mapa, move):
         #atualizar o mapa com a nova direçao q foi adicionada ao array path
         mapa.__setstate__(self._map)
+        print("-------------")
         x,y = move[0]
-
         # print(" aa ")
         # print(mapa.get_tile(mapa.keeper))
         # print(move[0])
@@ -193,8 +192,7 @@ class SearchPath:
             mapa.clear_tile(move[0])
             mapa.set_tile((x,y),Tiles.MAN)
             
-        p.append(move[1])
-        self.path.append(p) #p+move[1]  #DAR APPEND DO CAMINHO DO KEEPER ATE POSICAO DA CAIXA ANTERIOR+MOVE
+        self.path.append(move[1]) #p+move[1]  #DAR APPEND DO CAMINHO DO KEEPER ATE POSICAO DA CAIXA ANTERIOR+MOVE
         self._map = mapa.__getstate__()
         return 
 
