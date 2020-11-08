@@ -91,55 +91,75 @@ def valid_pushes(mapa, map):
                 pushes.append((box, "d"))
     return pushes
 
+def print_paths(mapa, paths):
+    i = 0
+    for path in paths:
+        print("num: "+ str(i))
+        mapa.__setstate__(path.map)
+        print(mapa)
+        print(path)
+        i += 1
+        print("\n")
+
 def main():
     async def agent_loop(server_address="localhost:8000", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
             await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
-            msg = await websocket.recv()
-            game_properties = json.loads(msg)
-
-            # # You can create your own map representation or use the game representation:
-            mapa = Map(game_properties["map"])
-
-            aux = 0
+            
             key = "d"
-            keys = ["w", "a", "s", "d"]
 
             while True:
                 try:
-                    state = json.loads(
+                    update = json.loads(
                         await websocket.recv()
-                    )  # receive game state, this must be called timely or your game will get out of sync with the server
+                    )  # TODO: ATENCAO!!! -> receive game update, this must be called timely or your game will get out of sync with the server
 
-                    paths = []
+                    if "map" in update:
+                        # we got a new level
+                        game_properties = update
+                        mapa = Map(update["map"])
+                        print(mapa)
+                    else:
+                        # we got a current map state update
+                        state = update
 
-                    ## mapa em str
-                    map = mapa.__getstate__()
-                    sp = SearchPath(map)
-                    pushes = valid_pushes(mapa, map)
-                    for push in pushes:
+                        paths = []
+
+                        ## mapa em str
+                        map = mapa.__getstate__()
                         sp = SearchPath(map)
-                        sp.updateMapa(mapa, push)
-                        m =  sp.map
-                        paths.append(sp.__str__())
+                        pushes = valid_pushes(mapa, map)
+                        for push in pushes:
+                            sp = SearchPath(map)
+                            sp.updateMapa(mapa, push)
+                            paths.append(sp)
 
-                    print(paths)
+                        
+                        print_paths(mapa, paths)
+                        
 
-                    while not len(paths) == 0:
-                        sp = paths.pop(0)  
+                        while not len(paths) == 0:
+                            print("checkpoint!")
 
-                        if complete(mapa, m):
-                            break
+                            sp = paths.pop(0)  
 
-                        else:
-                            if is_deadlock(mapa, m):
+                            if complete(mapa, sp.map):
+                                print(sb)
                                 break
-  
-                    return sp
-                    # print("\n")
-                    # print(Map(f"levels/{state['level']}.xsb"))
+
+                            else:
+                                if is_deadlock(mapa, sp.map):
+                                    break
+                                else:
+                                    pushes = valid_pushes(mapa, sp.map)
+                                    for push in pushes:
+                                        sp = SearchPath(sb.map)
+                                        sp.updateMapa(mapa, push)
+                                        paths.append(sp)
+                        # print("\n")
+                        # print(Map(f"levels/{state['level']}.xsb"))
 
                     await websocket.send(
                         json.dumps({"cmd": "key", "key": key})
