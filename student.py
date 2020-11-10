@@ -14,6 +14,7 @@ from consts import Tiles, TILES
 import copy
 from SearchPath import *
 
+
 def adjacent_coords(pos):
     x, y = pos
     # 0-> up, 1-> right, 2-> down, 3-> left, clockwise
@@ -91,11 +92,22 @@ def valid_pushes(mapa, map):
                 pushes.append((box, "d"))
     return pushes
 
+def print_single_path(map):
+    screen = {tile: symbol for symbol, tile in TILES.items()}
+    for item in map:
+        for it in item:
+            print(screen[it], end="")
+
 def print_paths(mapa, paths):
     i = 0
     for path in paths:
         print("num: "+ str(i))
-        mapa.__setstate__(path.map)
+        print(path.map)
+        screen = {tile: symbol for symbol, tile in TILES.items()}
+        for item in path.map:
+            for it in item:
+                print(screen[it], end="")
+            print("\n")
         print(mapa)
         print(path)
         i += 1
@@ -132,18 +144,22 @@ def main():
                         sp = SearchPath(map)
                         pushes = valid_pushes(mapa, map)
                         for push in pushes:
-                            sp = SearchPath(map)
+                            sp = SearchPath(mapa.__getstate__())
+                            print(id(map))
+
+
                             sp.updateMapa(mapa, push)
                             paths.append(sp)
 
                         
-                        print_paths(mapa, paths)
+                        # print_paths(mapa, paths)
                         
 
                         while not len(paths) == 0:
                             print("checkpoint!")
 
-                            sp = paths.pop(0)  
+                            sp = paths.pop(0) 
+                            print(sp.map)
 
                             if complete(mapa, sp.map):
                                 print(sb)
