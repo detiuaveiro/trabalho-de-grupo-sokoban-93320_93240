@@ -1,4 +1,5 @@
 from mapa import Map
+import copy 
 from consts import Tiles, TILES
 import math
 from path import *
@@ -6,7 +7,6 @@ from path import *
 import copy
 
 class SearchPath:
-
     def __init__(self, map):
         self._map = copy.deepcopy(map)
         self.path = []
@@ -158,6 +158,7 @@ class SearchPath:
     def updateMapa(self, mapa, move):
         #atualizar o mapa com a nova direçao q foi adicionada ao array path
         mapa.__setstate__(self._map)
+        print(mapa)
         x,y = move[0]
 
         print("teste")
@@ -215,8 +216,7 @@ class SearchPath:
             mapa.clear_tile(move[0])
             mapa.set_tile((x,y),Tiles.MAN)
             
-        p.append(move[1])
-        self.path.append(p) #p+move[1]  #DAR APPEND DO CAMINHO DO KEEPER ATE POSICAO DA CAIXA ANTERIOR+MOVE
+        self.path.append(move[1]) #p+move[1]  #DAR APPEND DO CAMINHO DO KEEPER ATE POSICAO DA CAIXA ANTERIOR+MOVE
         self._map = mapa.__getstate__()
         return 
 
