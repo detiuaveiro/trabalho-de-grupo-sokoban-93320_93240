@@ -108,7 +108,7 @@ def main():
             # Receive information about static game properties
             await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
             
-            key = "d"
+            key = "s"
 
             while True:
                 try:
@@ -140,27 +140,39 @@ def main():
                             #print(mapa)
                             maps.append(mapa)
 
-                        print_paths(mapa, paths)
+                        #print_paths(mapa, paths)
                         
+                        ## problema: ele dá este print várias vezes
+
+                        ## justificação:
+                        # ele chega à resposta (AQUI), dá break e sai e volta a correr o algoritmo para o mesmo mapa,
+                        # pk nós não mandamos o suposto caminho de resolução do nível(AQUI2)
+
+                        #AQUI -> ele chega à resposta bué facilmente pk eu fiz bué cagada no valid pushes, tenho de corrigir (Pedro)
+                        # AQUI2 -> o print do caminho quando ele deteta que o mapa está completo é apenas 1 move, ou seja, que temos de fazre uma deepcopy
+                        # não só do sp.map com dp sp.path, (que no fundo corresponde a fazer deepcopy de tudo)
+                        print("eu estou aqui e começei de novo!")
 
                         while not len(paths) == 0:
-                            print("checkpoint!")
+                            print("checkpoint! mapa a que se deu pop:")
 
                             sp = paths.pop(0)
                             
-                            # mapa.__setstate__(sp.map)
-                            # print("***********")
-                            # print(mapa)
+                            mapa.__setstate__(sp.map)
+                            print("***********")
+                            print(mapa)
+                            print("***********")
                             
                             #currentMap = maps.pop(0)  
 
                             if complete(mapa, sp.map):
-                                print(sp)
+                                print("este mapa está correto!:")
+                                print("path para a resolução: "+str(sp))
                                 break
-
                             else:
                                 if is_deadlock(mapa, sp.map):
-                                    break
+                                    print("este mapa tem deadlock!")
+                                    continue
                                 else:
                                     pushes = valid_pushes(mapa, sp.map)
                                     aux  = copy.deepcopy(sp.map)
@@ -172,7 +184,7 @@ def main():
                                         # print(aux == sp.map)
                                         # print("***********")
                                         print(push)
-                                        sp = SearchPath(aux) #erro aqui pq n estamos a passar bem o mapa
+                                        sp = SearchPath(aux) 
                                         sp.updateMapa(mapa, push)
                                         paths.append(sp)
                         # print("\n")
@@ -197,7 +209,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8001")
+    PORT = os.environ.get("PORT", "8000")
     NAME = os.environ.get("NAME", getpass.getuser())
     loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
 

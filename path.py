@@ -1,4 +1,6 @@
 from tree_search import *
+from consts import Tiles, TILES
+import math
 
 class Path(SearchDomain):
     # construtor
@@ -47,7 +49,9 @@ class Path(SearchDomain):
     # custo estimado de chegar de um estado a outro
     # heuristic -> distância em linha reta do instante atual do kepper para o goal
     def heuristic(self, currPos, finalPos):
-        return math.hypot(currPos.coordinates, finalPos.coordinates)
+        x, y = currPos
+        x1, y1 = finalPos
+        return math.sqrt((y1 - y)**2 + (x1 - x)**2)
 
     # test if the given "goal" is satisfied in "state"
     # keeper postition == destination_goal
