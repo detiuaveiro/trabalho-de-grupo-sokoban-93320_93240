@@ -12,13 +12,23 @@ class Path(SearchDomain):
 
     # lista de accoes possiveis num estado
     # lista de available moves num determinado momento 
-    def actions(self, state):
-        pass
+    def actions(self, currPos):
+        x,y = currPos
+        valid = []
+        if self.mapa.get_tile((x+1,y)) not in (Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL):
+            valid.append("d")
+        if self.mapa.get_tile((x-1,y)) not in (Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL):
+            valid.append("a")
+        if self.mapa.get_tile((x,y+1)) not in (Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL):
+            valid.append("s")
+        if self.mapa.get_tile((x,y-1)) not in (Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL):
+            valid.append("w")
+        return valid
 
     # resultado de uma accao num estado, ou seja, o estado seguinte
     # coordenadas do estado seguinte, mediante a move
-    def result(self, state, action):
-        x, y = state
+    def result(self, currPos, action):
+        x, y = currPos
         if action == "w":
             return (x, y - 1)
         elif action == 'a':
@@ -31,15 +41,15 @@ class Path(SearchDomain):
 
     # custo de uma accao num estado
     # é sempre 1 supostamente
-    def cost(self, state, action):
+    def cost(self, currPos, action):
         return 1
 
     # custo estimado de chegar de um estado a outro
     # heuristic -> distância em linha reta do instante atual do kepper para o goal
-    def heuristic(self, state, goal):
-        pass
+    def heuristic(self, currPos, finalPos):
+        return math.hypot(currPos.coordinates, finalPos.coordinates)
 
     # test if the given "goal" is satisfied in "state"
     # keeper postition == destination_goal
-    def satisfies(self, state, goal):
-        return state[0] == goal[0] and state[1] == goal[1]
+    def satisfies(self, currPos, finalPos):
+        return currPos[0] == finalPos[0] and currPos[1] == finalPos[1]
