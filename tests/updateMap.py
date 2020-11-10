@@ -24,3 +24,7 @@ sb.updateMapa(mapa, ((1, 3), "w"))
 mapa.__setstate__(sb.map)
 
 print(mapa)
+
+sb.updateMapa(mapa, ((1,2), "w"))
+
+print_single_path(sb.map)
