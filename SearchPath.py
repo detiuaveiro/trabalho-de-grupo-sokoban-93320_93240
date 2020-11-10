@@ -24,7 +24,7 @@ class SearchPath:
 
         t = SearchTree(p, 'a*')
 
-        print t
+        print(t)
         
         return t
 
@@ -224,6 +224,7 @@ class SearchPath:
         return self._map
 
 def keeper_destination(move):
+    x, y = move[0]
     if move[1] == 'w': #up
         keeperDest = (x,y+1)      
     elif move[1] == 'd': #right
