@@ -14,7 +14,6 @@ from consts import Tiles, TILES
 import copy
 from SearchPath import *
 
-
 def adjacent_coords(pos):
     x, y = pos
     # 0-> up, 1-> right, 2-> down, 3-> left, clockwise
@@ -92,29 +91,18 @@ def valid_pushes(mapa, map):
                 pushes.append((box, "d"))
     return pushes
 
-def print_single_path(map):
-    screen = {tile: symbol for symbol, tile in TILES.items()}
-    for item in map:
-        for it in item:
-            print(screen[it], end="")
-
 def print_paths(mapa, paths):
     i = 0
     for path in paths:
         print("num: "+ str(i))
-        print(path.map)
-        screen = {tile: symbol for symbol, tile in TILES.items()}
-        for item in path.map:
-            for it in item:
-                print(screen[it], end="")
-            print("\n")
+        mapa.__setstate__(path.map)
         print(mapa)
         print(path)
         i += 1
         print("\n")
 
 def main():
-    async def agent_loop(server_address="localhost:8000", agent_name="student"):
+    async def agent_loop(server_address="localhost:8001", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
@@ -138,31 +126,36 @@ def main():
                         state = update
 
                         paths = []
+                        maps = []
 
                         ## mapa em str
                         map = mapa.__getstate__()
                         sp = SearchPath(map)
                         pushes = valid_pushes(mapa, map)
                         for push in pushes:
-                            sp = SearchPath(mapa.__getstate__())
-                            print(id(map))
-
-
+                            sp = SearchPath(map)
                             sp.updateMapa(mapa, push)
                             paths.append(sp)
+                            #print("!!!!!!!")
+                            #print(mapa)
+                            maps.append(mapa)
 
-                        
-                        # print_paths(mapa, paths)
+                        print_paths(mapa, paths)
                         
 
                         while not len(paths) == 0:
                             print("checkpoint!")
 
-                            sp = paths.pop(0) 
-                            print(sp.map)
+                            sp = paths.pop(0)
+                            
+                            # mapa.__setstate__(sp.map)
+                            # print("***********")
+                            # print(mapa)
+                            
+                            #currentMap = maps.pop(0)  
 
                             if complete(mapa, sp.map):
-                                print(sb)
+                                print(sp)
                                 break
 
                             else:
@@ -170,8 +163,16 @@ def main():
                                     break
                                 else:
                                     pushes = valid_pushes(mapa, sp.map)
+                                    aux  = copy.deepcopy(sp.map)
+                                    
+                                    # print(sp.map)
+                                    # print(".......")
                                     for push in pushes:
-                                        sp = SearchPath(sb.map)
+                                        # print(mapa)
+                                        # print(aux == sp.map)
+                                        # print("***********")
+                                        print(push)
+                                        sp = SearchPath(aux) #erro aqui pq n estamos a passar bem o mapa
                                         sp.updateMapa(mapa, push)
                                         paths.append(sp)
                         # print("\n")
@@ -196,7 +197,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8000")
+    PORT = os.environ.get("PORT", "8001")
     NAME = os.environ.get("NAME", getpass.getuser())
     loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
 
