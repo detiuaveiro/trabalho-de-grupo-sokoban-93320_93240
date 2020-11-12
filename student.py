@@ -71,9 +71,8 @@ def is_deadlock(mapa, map):
     return False
 
 
-# à aqui um problema enorme!
-# fazer uma função que identifique túneis
-# não funciona com túneis
+# há aqui um problema enorme! TODO: fazer uma função que identifique túneis
+# TODO: escolher as caixas: 2 hipoteses..1)distancia manhattan 2) caixa c + nº validPushes 1º e em caso de empate (distancia de manhattan) 
 def valid_pushes(mapa, map):
     mapa.__setstate__(map)
     # push = ((x, y), move)
@@ -128,16 +127,17 @@ def main():
 
                         ## mapa em str
                         map = mapa.__getstate__()
-                        sp = SearchPath(map)
                         pushes = valid_pushes(mapa, map)
                         for push in pushes:
-                            sp = SearchPath(map,[])
+                            sp = SearchPath(copy.deepcopy(map),[])
                             sp.updateMapa(mapa, push)
                             paths.append(sp)
+                            print("Push")
+                            print(push)
+                            print("Path")
                             print(sp.path)
                             print("!!!!!!!")
-                            #print(mapa)
-                            maps.append(mapa)
+                            print(mapa)
                             #print_paths(mapa, paths)
                         
                         ## problema: ele dá este print várias vezes
@@ -157,7 +157,6 @@ def main():
                             sp = paths.pop(0)
                             
                             mapa.__setstate__(sp.map)
-                            print("***********")
                             print(mapa)
                             print("***********")
                             
@@ -168,7 +167,7 @@ def main():
 
                             #TODO: testaaar e testar ciclo for a mandar keys
                             if complete(mapa, sp.map):
-                                print("este mapa está correto!:")
+                                print("este mapa está correto!")
                                 print("path para a resolução: "+str(sp.path))
                                 break
                             else:
@@ -183,16 +182,19 @@ def main():
                                     # print(".......")
                                     for push in pushes:
                                         # print(mapa)
-                                        # print(aux == sp.map)
-                                        # print("***********")
+                                        print("-----------")
+                                        print(map)
+                                        print("////////////")
                                         print(push)
                                         sp = SearchPath(aux.map, aux.path) 
                                         sp.updateMapa(mapa, push)
                                         paths.append(sp)
+                                        print("AFTER PUSH ----------")
+                                        print(mapa)
                                         #print_paths(mapa, paths)
                                 
                         # print("\n")
-                        # print(Map(f"levels/{state['level']}.xsb"))
+                        #print(Map(f"levels/{state['level']}.xsb"))
 
                     await websocket.send(
                         json.dumps({"cmd": "key", "key": key})

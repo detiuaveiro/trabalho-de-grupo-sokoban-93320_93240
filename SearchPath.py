@@ -8,7 +8,7 @@ import copy
 
 class SearchPath:
     def __init__(self, map,path):
-        self._map = map #copy.deepcopy(map) isto ja n é preciso right?
+        self._map = map 
         self.path = path
 
     # move[0] = coordenadas da caixa
@@ -18,13 +18,15 @@ class SearchPath:
         # keeper_dest is goal
         keeper_dest = keeper_destination(move)
 
-        path = Path(mapa, self.map)
+        pathDomain = Path(mapa, self.map)
 
-        p = SearchProblem(path, keeper, keeper_dest)
+        p = SearchProblem(pathDomain, keeper, keeper_dest)
 
         t = SearchTree(p, 'a*')
 
         moves = decode_moves([t.search()])
+        print(keeper)
+        print(keeper_dest)
 
         for move in moves:
             self.path.append(move)
@@ -93,11 +95,11 @@ class SearchPath:
                 mapa.set_tile((x-1,y),Tiles.BOX) 
 
         ##substitui a caixa pelo keeper 
-        if(mapa.get_tile(move[0]) == Tiles.BOX_ON_GOAL):
-            mapa.clear_tile(move[0])
-            mapa.set_tile(move[0],Tiles.MAN_ON_GOAL)
+        if(mapa.get_tile((x,y)) == Tiles.BOX_ON_GOAL):
+            mapa.clear_tile((x,y))
+            mapa.set_tile((x,y),Tiles.MAN_ON_GOAL)
         else:
-            mapa.clear_tile(move[0])
+            mapa.clear_tile((x,y))
             mapa.set_tile((x,y),Tiles.MAN)
             
         self.path.append(move[1]) #p+move[1]  #DAR APPEND DO CAMINHO DO KEEPER ATE POSICAO DA CAIXA ANTERIOR+MOVE
