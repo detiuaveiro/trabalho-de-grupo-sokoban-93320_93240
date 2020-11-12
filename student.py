@@ -13,6 +13,8 @@ import random
 from consts import Tiles, TILES
 import copy
 from SearchPath import *
+import math
+from path import *
 
 def adjacent_coords(pos):
     x, y = pos
@@ -75,19 +77,28 @@ def is_deadlock(mapa, map):
 # TODO: escolher as caixas: 2 hipoteses..1)distancia manhattan 2) caixa c + nº validPushes 1º e em caso de empate (distancia de manhattan) 
 def valid_pushes(mapa, map):
     mapa.__setstate__(map)
-    # push = ((x, y), move)
     boxes = mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL])
+    possible_pushes = []
     pushes = []
     for box in boxes:
-        adj = adjacent_coords(box)
-        if not mapa.is_blocked(adj[0]):
-            if not mapa.is_blocked(adj[2]):
-                pushes.append((box, "w"))
-                pushes.append((box, "s"))
-        if not mapa.is_blocked(adj[1]):
-            if not mapa.is_blocked(adj[3]):
-                pushes.append((box, "a"))
-                pushes.append((box, "d"))
+        adj_coords = adjacent_coords(box)
+        if not mapa.is_blocked(adj_coords[0]):
+            if not mapa.is_blocked(adj_coords[2]):
+                possible_pushes.append((box, 'w'))
+                possible_pushes.append((box, 's'))
+        if not mapa.is_blocked(adj_coords[1]):
+            if not mapa.is_blocked(adj_coords[3]):
+                possible_pushes.append((box, 'a'))
+                possible_pushes.append((box, 'd'))
+    for push in possible_pushes:
+        pathDomain = Path(mapa, map)
+        keeper_dest = keeper_destination(push)
+        p = SearchProblem(pathDomain, mapa.keeper, keeper_dest)
+        t = SearchTree(p, 'a*')
+        lstates = t.search(limit=20)
+        if lstates != None:
+            path = decode_moves(lstates)
+            pushes.append((push, path))
     return pushes
 
 def print_paths(mapa, paths):
@@ -100,8 +111,39 @@ def print_paths(mapa, paths):
         i += 1
         print("\n")
 
+def keeper_destination(move):
+    x, y = move[0]
+    if move[1] == 'w': #up
+        keeperDest = (x,y+1)      
+    elif move[1] == 'd': #right
+        keeperDest = (x+1,y)
+    elif move[1] == 's':   #down
+        keeperDest = (x,y-1)
+    elif move[1] == 'a':   #left
+        keeperDest = (x-1,y)
+    return keeperDest
+
+def decode_moves(lstates):
+    moves = []
+    for i in range(len(lstates) - 1):
+        state = lstates[i]
+        next_state = lstates[i + 1]
+
+        if state[0] < next_state[0]:
+            moves.append('d')
+        elif state[0] > next_state[0]:
+            moves.append('a')
+        else:
+            if state[1] > next_state[1]:
+                moves.append('w')
+            elif state[1] < next_state[1]:
+                moves.append('s')
+            else:
+                print("decode_moves: erro")
+    return moves
+
 def main():
-    async def agent_loop(server_address="localhost:8001", agent_name="student"):
+    async def agent_loop(server_address="localhost:8000", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
@@ -215,7 +257,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8001")
+    PORT = os.environ.get("PORT", "8000")
     NAME = os.environ.get("NAME", getpass.getuser())
     loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
 

@@ -16,18 +16,18 @@ from SearchPath import *
 #     ["#", "#", "#", "#", "-", "-"]
 # ]
 
-mapa = Map("../levels/1.xsb")
+mapa = Map("../levels/3.xsb")
 
 map = mapa.__getstate__()
 
-sb = SearchPath(map)
+print(mapa)
 
-print(valid_pushes(mapa, map))
+sb = SearchPath(map, [])
 
-sb.updateMapa(mapa, ((1, 3), "w"))
+pushes = valid_pushes(mapa, map)
 
-
-print(valid_pushes(mapa, map))
+for push in pushes:
+    print(push)
 
 ####
 #-.#
