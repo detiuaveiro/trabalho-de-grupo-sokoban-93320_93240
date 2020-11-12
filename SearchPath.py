@@ -7,9 +7,9 @@ from path import *
 import copy
 
 class SearchPath:
-    def __init__(self, map):
-        self._map = copy.deepcopy(map)
-        self.path = []
+    def __init__(self, map,path):
+        self._map = map #copy.deepcopy(map) isto ja n é preciso right?
+        self.path = path
 
     # move[0] = coordenadas da caixa
     # move[1] = direção do push

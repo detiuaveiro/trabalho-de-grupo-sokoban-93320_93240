@@ -114,7 +114,7 @@ def main():
                 try:
                     update = json.loads(
                         await websocket.recv()
-                    )  # TODO: ATENCAO!!! -> receive game update, this must be called timely or your game will get out of sync with the server
+                    )  #-> receive game update, this must be called timely or your game will get out of sync with the server
 
                     if "map" in update:
                         # we got a new level
@@ -124,23 +124,21 @@ def main():
                     else:
                         # we got a current map state update
                         state = update
-
                         paths = []
-                        maps = []
 
                         ## mapa em str
                         map = mapa.__getstate__()
                         sp = SearchPath(map)
                         pushes = valid_pushes(mapa, map)
                         for push in pushes:
-                            sp = SearchPath(map)
+                            sp = SearchPath(map,[])
                             sp.updateMapa(mapa, push)
                             paths.append(sp)
-                            #print("!!!!!!!")
+                            print(sp.path)
+                            print("!!!!!!!")
                             #print(mapa)
                             maps.append(mapa)
-
-                        #print_paths(mapa, paths)
+                            #print_paths(mapa, paths)
                         
                         ## problema: ele dá este print várias vezes
 
@@ -163,11 +161,15 @@ def main():
                             print(mapa)
                             print("***********")
                             
+                            #msg para keep alive temos q manter isto a funcionar (tens de interromper em menos de 100 ms se nao n tens tempo de processar as cenas e receber as mensagens a tempo????)
+                            update = json.loads(await websocket.recv())                              
+                            
                             #currentMap = maps.pop(0)  
 
+                            #TODO: testaaar e testar ciclo for a mandar keys
                             if complete(mapa, sp.map):
                                 print("este mapa está correto!:")
-                                print("path para a resolução: "+str(sp))
+                                print("path para a resolução: "+str(sp.path))
                                 break
                             else:
                                 if is_deadlock(mapa, sp.map):
@@ -175,7 +177,7 @@ def main():
                                     continue
                                 else:
                                     pushes = valid_pushes(mapa, sp.map)
-                                    aux  = copy.deepcopy(sp.map)
+                                    aux  = copy.deepcopy(sp)
                                     
                                     # print(sp.map)
                                     # print(".......")
@@ -184,9 +186,11 @@ def main():
                                         # print(aux == sp.map)
                                         # print("***********")
                                         print(push)
-                                        sp = SearchPath(aux) 
+                                        sp = SearchPath(aux.map, aux.path) 
                                         sp.updateMapa(mapa, push)
                                         paths.append(sp)
+                                        #print_paths(mapa, paths)
+                                
                         # print("\n")
                         # print(Map(f"levels/{state['level']}.xsb"))
 
@@ -209,7 +213,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8000")
+    PORT = os.environ.get("PORT", "8001")
     NAME = os.environ.get("NAME", getpass.getuser())
     loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
 
