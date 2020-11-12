@@ -14,6 +14,3 @@ p = Path(mapa, map)
 print(mapa)
 print(mapa.keeper)
 print(p.actions((3, 4)))
-
-
-

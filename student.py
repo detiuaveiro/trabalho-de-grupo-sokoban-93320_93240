@@ -74,7 +74,10 @@ def is_deadlock(mapa, map):
 
 
 # há aqui um problema enorme! TODO: fazer uma função que identifique túneis
-# TODO: escolher as caixas: 2 hipoteses..1)distancia manhattan 2) caixa c + nº validPushes 1º e em caso de empate (distancia de manhattan) 
+# TODO: escolher as caixas: 2 hipoteses..1)distancia manhattan 2) caixa c + nº validPushes 1º e em caso de empate (distancia de manhattan)
+# move[0] = coords da caixa
+# move[1] = direção
+# path -> pathBetween
 def valid_pushes(mapa, map):
     mapa.__setstate__(map)
     boxes = mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL])
@@ -100,16 +103,8 @@ def valid_pushes(mapa, map):
                 possible_pushes.append((box, 'a'))
 
     for push in possible_pushes:
-        print(push)
-    print("\n")
-    
-
-    for push in possible_pushes:
         pathDomain = Path(mapa, map)
         keeper_dest = keeper_destination(push)
-        print('push:' + str(push))
-        print(mapa.keeper)
-        print(keeper_dest)
         p = SearchProblem(pathDomain, mapa.keeper, keeper_dest)
         t = SearchTree(p, 'a*')
         lstates = t.search(limit=20)
