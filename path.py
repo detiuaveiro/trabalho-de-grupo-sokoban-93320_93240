@@ -17,13 +17,13 @@ class Path(SearchDomain):
     def actions(self, currPos):
         x,y = currPos
         valid = []
-        if self.mapa.get_tile((x+1,y)) not in (Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL):
+        if self.mapa.get_tile((x+1,y)) not in [Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL]:
             valid.append("d")
-        if self.mapa.get_tile((x-1,y)) not in (Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL):
+        if self.mapa.get_tile((x-1,y)) not in [Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL]:
             valid.append("a")
-        if self.mapa.get_tile((x,y+1)) not in (Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL):
+        if self.mapa.get_tile((x,y+1)) not in [Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL]:
             valid.append("s")
-        if self.mapa.get_tile((x,y-1)) not in (Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL):
+        if self.mapa.get_tile((x,y-1)) not in [Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL]:
             valid.append("w")
         return valid
 

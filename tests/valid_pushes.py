@@ -16,7 +16,7 @@ from SearchPath import *
 #     ["#", "#", "#", "#", "-", "-"]
 # ]
 
-mapa = Map("../levels/3.xsb")
+mapa = Map("../levels/1.xsb")
 
 map = mapa.__getstate__()
 

@@ -109,38 +109,6 @@ class SearchPath:
     def get_mapa(self):
         return self._map
 
-def keeper_destination(move):
-    x, y = move[0]
-    if move[1] == 'w': #up
-        keeperDest = (x,y+1)      
-    elif move[1] == 'd': #right
-        keeperDest = (x+1,y)
-    elif move[1] == 's':   #down
-        keeperDest = (x,y-1)
-    elif move[1] == 'a':   #left
-        keeperDest = (x-1,y)
-    return keeperDest
-
-
-def decode_moves(lstates):
-    moves = []
-    for i in range(len(lstates) - 1):
-        state = lstates[i]
-        next_state = lstates[i + 1]
-
-        if state[0] > next_state[0]:
-            moves.append('d')
-        elif state[0] < next_state[0]:
-            moves.append('a')
-        else:
-            if state[1] < next_state[1]:
-                moves.append('w')
-            elif state[1] > next_state[1]:
-                moves.append('s')
-            else:
-                print("decode_moves: erro")
-    return moves
-
 
 #TODO 's: MARIA: Fazer funcao pra escolher a box a dar pushes.. objetivo: provocar deadlocks pra excluir logo esses caminhos
 #MSGS pra trocar com o server (hello) -> keep alive para podermos continuar o jogo sem q ele desconecte

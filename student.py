@@ -80,23 +80,40 @@ def valid_pushes(mapa, map):
     boxes = mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL])
     possible_pushes = []
     pushes = []
+    aux = [Tiles.BOX, Tiles.BOX_ON_GOAL]
+    aux1 = aux + [Tiles.WALL]
+    print(mapa.keeper)
     for box in boxes:
         adj_coords = adjacent_coords(box)
-        if not mapa.is_blocked(adj_coords[0]):
-            if not mapa.is_blocked(adj_coords[2]):
-                possible_pushes.append((box, 'w'))
+        adj_tiles = adjacent_tiles(mapa, box)
+        if not mapa.get_tile(adj_coords[0]) in aux1:
+            if not mapa.is_blocked(adj_coords[2]) and adj_tiles[2] not in aux:
                 possible_pushes.append((box, 's'))
-        if not mapa.is_blocked(adj_coords[1]):
-            if not mapa.is_blocked(adj_coords[3]):
-                possible_pushes.append((box, 'a'))
+        if not mapa.get_tile(adj_coords[1]) in aux1:
+            if not mapa.is_blocked(adj_coords[3]) and adj_tiles[3] not in aux:
                 possible_pushes.append((box, 'd'))
+        if not mapa.get_tile(adj_coords[2]) in aux1:
+            if not mapa.is_blocked(adj_coords[0]) and adj_tiles[0] not in aux:
+                possible_pushes.append((box, 'w'))
+        if not mapa.get_tile(adj_coords[3]) in aux1:
+            if not mapa.is_blocked(adj_coords[1]) and adj_tiles[2] not in aux:
+                possible_pushes.append((box, 'a'))
+
+    for push in possible_pushes:
+        print(push)
+    print("\n")
+    
+
     for push in possible_pushes:
         pathDomain = Path(mapa, map)
         keeper_dest = keeper_destination(push)
+        print('push:' + str(push))
+        print(mapa.keeper)
+        print(keeper_dest)
         p = SearchProblem(pathDomain, mapa.keeper, keeper_dest)
         t = SearchTree(p, 'a*')
         lstates = t.search(limit=20)
-        if lstates != None:
+        if lstates is not None:
             path = decode_moves(lstates)
             pushes.append((push, path))
     return pushes
@@ -114,13 +131,13 @@ def print_paths(mapa, paths):
 def keeper_destination(move):
     x, y = move[0]
     if move[1] == 'w': #up
-        keeperDest = (x,y+1)      
+        keeperDest = (x,y - 1)      
     elif move[1] == 'd': #right
-        keeperDest = (x+1,y)
-    elif move[1] == 's':   #down
-        keeperDest = (x,y-1)
-    elif move[1] == 'a':   #left
         keeperDest = (x-1,y)
+    elif move[1] == 's':   #down
+        keeperDest = (x,y+1)
+    elif move[1] == 'a':   #left
+        keeperDest = (x+1,y)
     return keeperDest
 
 def decode_moves(lstates):
