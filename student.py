@@ -72,8 +72,6 @@ def is_deadlock(mapa, map):
                             return True
     return False
 
-
-# há aqui um problema enorme! TODO: fazer uma função que identifique túneis
 # TODO: escolher as caixas: 2 hipoteses..1)distancia manhattan 2) caixa c + nº validPushes 1º e em caso de empate (distancia de manhattan)
 # move[0] = coords da caixa
 # move[1] = direção
@@ -155,7 +153,7 @@ def decode_moves(lstates):
     return moves
 
 def main():
-    async def agent_loop(server_address="localhost:8000", agent_name="student"):
+    async def agent_loop(server_address="localhost:8001", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
@@ -186,12 +184,12 @@ def main():
                             sp = SearchPath(copy.deepcopy(map),[])
                             sp.updateMapa(mapa, push)
                             paths.append(sp)
-                            print("Push")
-                            print(push)
-                            print("Path")
-                            print(sp.path)
-                            print("!!!!!!!")
-                            print(mapa)
+                            #print("Push")
+                            #print(push)
+                            #print("Path")
+                            #print(sp.path)
+                            #print("!!!!!!!")
+                            #print(mapa)
                             #print_paths(mapa, paths)
                         
                         ## problema: ele dá este print várias vezes
@@ -208,9 +206,9 @@ def main():
                         while not len(paths) == 0:
                             print("checkpoint! mapa a que se deu pop:")
 
-                            sp = paths.pop(0)
+                            spi = paths.pop(0)
                             
-                            mapa.__setstate__(sp.map)
+                            mapa.__setstate__(spi.map)
                             print(mapa)
                             print("***********")
                             
@@ -219,27 +217,31 @@ def main():
                             
                             #currentMap = maps.pop(0)  
 
-                            #TODO: testaaar e testar ciclo for a mandar keys
-                            if complete(mapa, sp.map):
+                            if complete(mapa, spi.map):
                                 print("este mapa está correto!")
-                                print("path para a resolução: "+str(sp.path))
+                                print("path para a resolução: "+str(spi.path))
                                 break
                             else:
-                                if is_deadlock(mapa, sp.map):
+                                if is_deadlock(mapa, spi.map):
                                     print("este mapa tem deadlock!")
                                     continue
                                 else:
-                                    pushes = valid_pushes(mapa, sp.map)
-                                    aux  = copy.deepcopy(sp)
-                                    
-                                    # print(sp.map)
+                                    pushes = valid_pushes(mapa, spi.map)
+                                    aux  = copy.deepcopy(spi)
+
+                                    print("DEVERIA ESTAR SMP ASSIM NO INICIO DE CADA PUSH:")
+                                    print(spi.map)
                                     # print(".......")
                                     for push in pushes:
                                         # print(mapa)
                                         print("-----------")
-                                        print(map)
-                                        print("////////////")
+                                        # print(mapa)
+                                        # print("////////////")
                                         print(push)
+                                        # print("AUX: ")
+                                        # print(aux.map)
+                                        # print(aux.path)
+                                        print(spi.map == aux.map)
                                         sp = SearchPath(aux.map, aux.path) 
                                         sp.updateMapa(mapa, push)
                                         paths.append(sp)
@@ -269,16 +271,9 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8000")
+    PORT = os.environ.get("PORT", "8001")
     NAME = os.environ.get("NAME", getpass.getuser())
     loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
-
-# functions:
-
-def ola(number):
-    number = number + 1 
-    print("olá!")
-
 
 
 # ----
