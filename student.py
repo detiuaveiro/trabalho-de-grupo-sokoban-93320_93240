@@ -83,7 +83,7 @@ def valid_pushes(mapa, map):
     pushes = []
     aux = [Tiles.BOX, Tiles.BOX_ON_GOAL]
     aux1 = aux + [Tiles.WALL]
-    print(mapa.keeper)
+    #print(mapa.keeper)
     for box in boxes:
         adj_coords = adjacent_coords(box)
         adj_tiles = adjacent_tiles(mapa, box)
@@ -209,8 +209,8 @@ def main():
                             spi = paths.pop(0)
                             
                             mapa.__setstate__(spi.map)
-                            print(mapa)
-                            print("***********")
+                            #print(mapa)
+                            #print("***********")
                             
                             #msg para keep alive temos q manter isto a funcionar (tens de interromper em menos de 100 ms se nao n tens tempo de processar as cenas e receber as mensagens a tempo????)
                             update = json.loads(await websocket.recv())                              
@@ -218,8 +218,10 @@ def main():
                             #currentMap = maps.pop(0)  
 
                             if complete(mapa, spi.map):
-                                print("este mapa está correto!")
+                                print("MAPA CORRETO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                                print(mapa)
                                 print("path para a resolução: "+str(spi.path))
+                                print("SUPOSTO FIM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                                 break
                             else:
                                 if is_deadlock(mapa, spi.map):
@@ -227,26 +229,22 @@ def main():
                                     continue
                                 else:
                                     pushes = valid_pushes(mapa, spi.map)
-                                    aux  = copy.deepcopy(spi)
-
-                                    print("DEVERIA ESTAR SMP ASSIM NO INICIO DE CADA PUSH:")
-                                    print(spi.map)
                                     # print(".......")
                                     for push in pushes:
+                                        aux  = copy.deepcopy(spi)
                                         # print(mapa)
-                                        print("-----------")
+                                        #print("-----------")
                                         # print(mapa)
                                         # print("////////////")
-                                        print(push)
+                                        #print(push)
                                         # print("AUX: ")
                                         # print(aux.map)
                                         # print(aux.path)
-                                        print(spi.map == aux.map)
                                         sp = SearchPath(aux.map, aux.path) 
                                         sp.updateMapa(mapa, push)
                                         paths.append(sp)
-                                        print("AFTER PUSH ----------")
-                                        print(mapa)
+                                        #print("AFTER PUSH ----------")
+                                        #print(mapa)
                                         #print_paths(mapa, paths)
                                 
                         # print("\n")

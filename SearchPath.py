@@ -24,11 +24,12 @@ class SearchPath:
     def updateMapa(self, mapa, push):
         #atualizar o mapa com a nova direçao q foi adicionada ao array path
         mapa.__setstate__(self._map)
-        print("mapa que chega a UpdateMapa")
-        print(mapa)
-        print("COORDS DA CAIXA: "+str(push[0][0]))
+        # print("mapa que chega a UpdateMapa")
+        # print(mapa)
+        # print("COORDS DA CAIXA: "+str(push[0][0]))
         x,y = push[0][0] #coords da box
-        self.path.append(push[1])   #pathBetween
+        for j in push[1]:
+            self.path.append(j)   #pathBetween
 
         ##apaga o keeper anterior
         if(mapa.get_tile(mapa.keeper) == Tiles.MAN_ON_GOAL):
@@ -38,7 +39,7 @@ class SearchPath:
             mapa.clear_tile(mapa.keeper)
             mapa.set_tile(mapa.keeper,Tiles.FLOOR)
         
-        print("MOVE "+ str(push[0][1]))
+        # print("MOVE "+ str(push[0][1]))
         ## nova posicao da caixa
         if push[0][1] == 'w': #up
             if(mapa.get_tile((x,y-1)) == Tiles.GOAL):
