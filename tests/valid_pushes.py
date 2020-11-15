@@ -28,6 +28,8 @@ pushes = valid_pushes(mapa, map)
 
 for push in pushes:
     print(push)
+    print(push[0][1])
+    print(push[1])
 
 ####
 #-.#

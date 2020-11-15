@@ -15,6 +15,7 @@ import copy
 from SearchPath import *
 import math
 from path import *
+import sys
 
 def adjacent_coords(pos):
     x, y = pos
@@ -85,6 +86,7 @@ def valid_pushes(mapa, map):
     aux1 = aux + [Tiles.WALL]
     #print(mapa.keeper)
     for box in boxes:
+        # print("-----------------im in valid_pushes---------------")
         adj_coords = adjacent_coords(box)
         adj_tiles = adjacent_tiles(mapa, box)
         if not mapa.get_tile(adj_coords[0]) in aux1:
@@ -103,11 +105,17 @@ def valid_pushes(mapa, map):
     for push in possible_pushes:
         pathDomain = Path(mapa, map)
         keeper_dest = keeper_destination(push)
+        # print("mapa.keeper na função valid_pushes: " + str(mapa.keeper))
+        # print(mapa)
         p = SearchProblem(pathDomain, mapa.keeper, keeper_dest)
         t = SearchTree(p, 'a*')
         lstates = t.search(limit=20)
         if lstates is not None:
             path = decode_moves(lstates)
+            # print("push: " + str(push))
+            # print("path to push" + str(path))
+            if path == ['d', 's', 'a']:
+                sys.exit()
             pushes.append((push, path))
     return pushes
 
@@ -124,13 +132,13 @@ def print_paths(mapa, paths):
 def keeper_destination(move):
     x, y = move[0]
     if move[1] == 'w': #up
-        keeperDest = (x,y - 1)      
+        keeperDest = (x, y + 1)      
     elif move[1] == 'd': #right
-        keeperDest = (x-1,y)
+        keeperDest = (x - 1,y)
     elif move[1] == 's':   #down
-        keeperDest = (x,y+1)
+        keeperDest = (x, y - 1)
     elif move[1] == 'a':   #left
-        keeperDest = (x+1,y)
+        keeperDest = (x + 1,y)
     return keeperDest
 
 def decode_moves(lstates):
@@ -153,7 +161,7 @@ def decode_moves(lstates):
     return moves
 
 def main():
-    async def agent_loop(server_address="localhost:8001", agent_name="student"):
+    async def agent_loop(server_address="localhost:8000", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
@@ -204,11 +212,11 @@ def main():
                         print("eu estou aqui e começei de novo!")
 
                         while not len(paths) == 0:
-                            print("checkpoint! mapa a que se deu pop:")
+                            # print("checkpoint! mapa a que se deu pop:")
 
-                            spi = paths.pop(0)
+                            spi = paths.pop()
                             
-                            mapa.__setstate__(spi.map)
+                            # mapa.__setstate__(spi.map)
                             #print(mapa)
                             #print("***********")
                             
@@ -219,13 +227,14 @@ def main():
 
                             if complete(mapa, spi.map):
                                 print("MAPA CORRETO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                                mapa.__setstate__(spi.map)
                                 print(mapa)
                                 print("path para a resolução: "+str(spi.path))
                                 print("SUPOSTO FIM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                                break
+                                sys.exit()
                             else:
                                 if is_deadlock(mapa, spi.map):
-                                    print("este mapa tem deadlock!")
+                                    # print("este mapa tem deadlock!")
                                     continue
                                 else:
                                     pushes = valid_pushes(mapa, spi.map)
@@ -269,7 +278,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8001")
+    PORT = os.environ.get("PORT", "8000")
     NAME = os.environ.get("NAME", getpass.getuser())
     loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
 

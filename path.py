@@ -31,7 +31,7 @@ class Path(SearchDomain):
     # coordenadas do estado seguinte, mediante a move
     def result(self, currPos, action):
         x, y = currPos
-        if action == "w":
+        if action == 'w':
             return (x, y - 1)
         elif action == 'a':
             return (x - 1, y)
