@@ -25,10 +25,6 @@ class SearchPath:
     def updateMapa(self, mapa, push):
         #atualizar o mapa com a nova direçao q foi adicionada ao array path
         mapa.__setstate__(self._map)
-        # print("------------------im in UpdateMapa----------------")
-        # print(mapa)
-        # print("COORDS DA CAIXA: "+str(push[0][0]))
-        # print("move:" + str(push[0][1]))
         x,y = push[0][0] #coords da box
         for j in push[1]:
             self.path.append(j)   #pathBetween
@@ -46,33 +42,20 @@ class SearchPath:
         # print("MOVE "+ str(push[0][1]))
         ## nova posicao da caixa
         if dir == 'w': #up
-            if(mapa.get_tile((x,y-1)) == Tiles.GOAL):
-                mapa.clear_tile((x,y-1))
-                mapa.set_tile((x,y-1),Tiles.BOX_ON_GOAL)
-            else:
-                mapa.clear_tile((x,y-1))
-                mapa.set_tile((x,y-1),Tiles.BOX)
+            coords = (x,y-1)
         elif dir == 'd': #right
-            if(mapa.get_tile((x+1,y)) == Tiles.GOAL):
-                mapa.clear_tile((x+1,y))
-                mapa.set_tile((x+1,y),Tiles.BOX_ON_GOAL)
-            else:
-                mapa.clear_tile((x+1,y))
-                mapa.set_tile((x+1,y),Tiles.BOX)      
+            coords = (x+1,y)
         elif dir == 's':   #down
-            if(mapa.get_tile((x,y+1)) == Tiles.GOAL):
-                mapa.clear_tile((x,y+1))
-                mapa.set_tile((x,y+1),Tiles.BOX_ON_GOAL)
-            else:
-                mapa.clear_tile((x,y+1))
-                mapa.set_tile((x,y+1),Tiles.BOX)      
+            coords = (x,y+1)
         elif dir == 'a':   #left
-            if(mapa.get_tile((x-1,y)) == Tiles.GOAL):
-                mapa.clear_tile((x-1,y))
-                mapa.set_tile((x-1,y),Tiles.BOX_ON_GOAL)
-            else:
-                mapa.clear_tile((x-1,y))
-                mapa.set_tile((x-1,y),Tiles.BOX) 
+            coords = (x-1,y)
+
+        if(mapa.get_tile(coords) == Tiles.GOAL):
+            mapa.clear_tile(coords)
+            mapa.set_tile(coords,Tiles.BOX_ON_GOAL)
+        else:
+            mapa.clear_tile(coords)
+            mapa.set_tile(coords,Tiles.BOX)
 
         ##substitui a caixa pelo keeper 
         if(mapa.get_tile((x,y)) == Tiles.BOX_ON_GOAL):
@@ -82,20 +65,11 @@ class SearchPath:
             mapa.clear_tile((x,y))
             mapa.set_tile((x,y),Tiles.MAN)
             
-        self.path.append(dir) #p+push[0][1]  #DAR APPEND DO CAMINHO DO KEEPER ATE POSICAO DA CAIXA ANTERIOR+MOVE
-        # print("path so far: " + str(self.path))
+        self.path.append(dir) 
         self._map = mapa.__getstate__()
-        # print("mapa atualizado1: ")
-        # print(mapa)
-        # if self.path == ['s', 'a', 'w']:
-        #     print(self.path)
-        #     print('aqui2!')
-            # sys.exit()
         return 
 
     def get_mapa(self):
         return self._map
 
 ## http://bomberman-aulas.ws.atnog.av.it.pt/table.html
-
-## por discutir:
