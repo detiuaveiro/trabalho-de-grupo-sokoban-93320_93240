@@ -1,19 +1,85 @@
 from tree_search import *
 from consts import Tiles, TILES
 import math
+import copy
+from SearchPath import *
 
 class Push(SearchDomain):
     # construtor
     def __init__(self, mapa):
-        pass
+        self.mapa
+
+    # state = instancia de SearchPath
+    # action = pushes possíveis
 
     # lista de accoes possiveis num estado
     def actions(self, state):
-        pass
+        boxes = state.mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL])
+        pushes = set()
+        aux = [Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL]
+        #print(mapa.keeper)
+        for box in boxes:
+            adj_tiles = adjacent_tiles(state.mapa, box)
+            if adj_tiles[0] not in aux:
+                if adj_tiles[2] not in aux:
+                    pushes.add((box, 's'))
+            if adj_tiles[1] not in aux:
+                if adj_tiles[3] not in aux:
+                    pushes.add((box, 'd'))
+            if adj_tiles[2] not in aux:
+                if adj_tiles[0] not in aux:
+                    pushes.add((box, 'w'))
+            if adj_tiles[3] not in aux:
+                if adj_tiles[1] not in aux:
+                    pushes.add((box, 'a'))
+
+        for push in pushes:
+            newstate = self.result(state, push)
+            if is_deadlock(newstate.mapa):
+                pushes.remove(push)
+        return list(pushes)
 
     # resultado de uma accao num estado, ou seja, o estado seguinte
     def result(self, state, action):
-        pass
+        # action[0] = coords da caixa
+        # action[1] = direção do push
+        mapa = copy.deepcopy(state.mapa)
+        x,y = action[0] #coords da box
+
+        ##apaga o keeper anterior
+        if(mapa.get_tile(mapa.keeper) == Tiles.MAN_ON_GOAL):
+            mapa.clear_tile(mapa.keeper)
+            mapa.set_tile(mapa.keeper,Tiles.GOAL)
+        else:
+            mapa.clear_tile(mapa.keeper)
+            mapa.set_tile(mapa.keeper,Tiles.FLOOR)
+
+        if dir == 'w': #up
+            coords = (x,y-1)
+        elif dir == 'd': #right
+            coords = (x+1,y)
+        elif dir == 's':   #down
+            coords = (x,y+1)
+        elif dir == 'a':   #left
+            coords = (x-1,y)
+
+        ## desenha a caixa no sítio certo
+        if(mapa.get_tile(coords) == Tiles.GOAL):
+            mapa.clear_tile(coords)
+            mapa.set_tile(coords,Tiles.BOX_ON_GOAL)
+        else:
+            mapa.clear_tile(coords)
+            mapa.set_tile(coords,Tiles.BOX)
+
+        ##substitui a caixa pelo keeper 
+        if(mapa.get_tile((x,y)) == Tiles.BOX_ON_GOAL):
+            mapa.clear_tile((x,y))
+            mapa.set_tile((x,y),Tiles.MAN_ON_GOAL)
+        else:
+            mapa.clear_tile((x,y))
+            mapa.set_tile((x,y),Tiles.MAN)
+
+        return SearchPath(mapa, state.pushes)
 
     # custo de uma accao num estado
     def cost(self, state, action):
@@ -26,3 +92,47 @@ class Push(SearchDomain):
     # test if the given "goal" is satisfied in "state"
     def satisfies(self, state, goal):
         pass
+
+
+def adjacent_tiles(mapa,pos):
+    x, y = pos
+
+    tl = mapa.get_tile((x - 1, y))
+    tr = mapa.get_tile((x + 1, y))
+    tu = mapa.get_tile((x, y - 1))
+    td = mapa.get_tile((x, y + 1))
+
+def is_deadlock(mapa):
+    # boxes out goal
+    bogs = mapa.filter_tiles([Tiles.BOX])
+    boxes = mapa.filter_tiles([Tiles.BOX_ON_GOAL, Tiles.BOX])
+
+    for bog in bogs:
+        if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] - 1)) or \
+        mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] - 1)) or \
+        mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] + 1)) or \
+        mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] + 1)):
+            return True
+
+        tiles = adjacent_tiles(mapa, bog)
+        coords = adjacent_coords(bog)
+
+        boxes.remove(bog)
+
+        for box in boxes:
+            if box in coords:
+                if box in [coords[0], coords[2]]:
+                    if box in [coords[0]]:
+                        if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0] - 1, bog[1] - 1)) or mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)):
+                            return True
+                    else:
+                        if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0] - 1, bog[1] + 1)) or mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0] + 1, bog[1] + 1)):
+                            return True
+                else:
+                    if box in [coords[3]]:
+                        if mapa.is_blocked((bog[0], bog[1] - 1)) and mapa.is_blocked((bog[0] - 1, bog[1] - 1)) or mapa.is_blocked((bog[0], bog[1] + 1)) and mapa.is_blocked((bog[0] - 1, bog[1] + 1)):
+                            return True
+                    else:
+                        if mapa.is_blocked((bog[0], bog[1] - 1)) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)) or mapa.is_blocked((bog[0], bog[1] + 1)) and mapa.is_blocked((bog[0] + 1, bog[1] + 1)):
+                            return True
+    return False

@@ -59,6 +59,10 @@ class Map:
         )  # X, Y
 
     @property
+    def map(self):
+        return self._map
+
+    @property
     def size(self):
         """Size of map."""
         return self.hor_tiles, self.ver_tiles
@@ -144,7 +148,7 @@ class Map:
 
 
 if __name__ == "__main__":
-    mapa = Map("levels/2.xsb")
+    mapa = Map("levels/1.xsb")
     print(mapa)
     assert mapa.keeper == (11, 8)
     assert mapa.get_tile((4, 2)) == Tiles.WALL

@@ -33,7 +33,7 @@ def adjacent_tiles(mapa,pos):
     td = mapa.get_tile((x, y + 1))
 
     return [tu, tr, td, tl] # up, right, down, left, clockwise
-
+    
 def is_deadlock(mapa, map):
     # boxes out goal
     mapa.__setstate__(map)
@@ -161,8 +161,11 @@ def main():
             push = Push(mapa)
             p = SearchProblem(push, mapa.__getstate__(), get_mapa_goal(mapa))
             t = SearchTree(p, 'breadth')
-            keys = t.search()
-            await solution.put(''.join(keys))
+
+            ## juntar os caminhos
+
+            # keys = t.search()
+            # await solution.put(''.join(keys))
             
 
 

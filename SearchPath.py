@@ -8,15 +8,18 @@ import sys
 import copy
 
 class SearchPath:
-    def __init__(self, map,path):
-        self._map = map 
-        self.path = path
+    def __init__(self, mapa, pushes):
+        self.mapa = mapa
+        self.pushes = pushes
 
     def __str__(self):
         sp_str = "["
         for m in self.path:
             sp_str+=m
         return sp_str+"]"
+
+    def __hash__(self):
+        return hash(self.mapa.map)
     
     @property
     def map(self):
@@ -68,8 +71,5 @@ class SearchPath:
         self.path.append(dir) 
         self._map = mapa.__getstate__()
         return 
-
-    def get_mapa(self):
-        return self._map
 
 ## http://bomberman-aulas.ws.atnog.av.it.pt/table.html
