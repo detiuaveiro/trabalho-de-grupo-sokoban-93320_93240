@@ -83,15 +83,37 @@ class Push(SearchDomain):
 
     # custo de uma accao num estado
     def cost(self, state, action):
-        pass
+        return 1
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state, goal):
-        pass
+        x, y = state
+        x1, y1 = goal
+        return math.sqrt((y1 - y)**2 + (x1 - x)**2)
+
+        # tentativa 1
+        # boxes = state.mapa.filter_tiles(Tiles.BOX)
+        # goals = state.mapa.empty_goals
+        # distances = []
+        
+        # for box in boxes:
+        #     for g in goals:
+        #         distances.append(abs(box[0]-g[0])+abs(box[1]-g[1]))
+        # return int(sum(distances) / len(distances)) if distances else 0
+
+        #tentativa 2
+            # # heuristics.add(box, float("inf"))
+            # for g in state.mapa.filter_tiles(Tiles.GOAL):
+            #     distance = abs(box[0]-g[0])+abs(box[1]-g[1])
+            #     if g not in heuristics.keys():
+            #         heuristics[g] =  distance
+            #     else:
+            #         if heuristics[g] >= distance:
+            #             min_dist = distance 
 
     # test if the given "goal" is satisfied in "state"
     def satisfies(self, state, goal):
-        pass
+        return state.mapa.completed
 
 
 def adjacent_tiles(mapa,pos):
