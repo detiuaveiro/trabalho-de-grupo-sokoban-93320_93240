@@ -13,6 +13,7 @@ from SearchPath import *
 import math
 from path import *
 import sys
+from push import *
 
 def adjacent_coords(pos):
     x, y = pos
@@ -145,47 +146,27 @@ def decode_moves(lstates):
                 print("decode_moves: erro")
     return moves
 
+def get_mapa_goal(mapa):
+    pass
+
+    # await asyncio.sleep(0)
+
 def main():
     async def solver(puzzle, solution):
         while True:
             game_properties = await puzzle.get()
             mapa = Map(game_properties["map"])
             #print(mapa)
-            paths = set()
 
-            ## mapa em str
-            map = mapa.__getstate__()
-            pushes = valid_pushes(mapa, map)
-            for push in pushes:
-                sp = SearchPath(copy.deepcopy(map),[])
-                sp.updateMapa(mapa, push)
-                paths.add(sp)
-
-            while not len(paths) == 0:
-                spi = paths.pop()
-                await asyncio.sleep(0)
-                                           
-                if complete(mapa, spi.map):
-                    #print("MAPA CORRETO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                    mapa.__setstate__(spi.map)
-                    # print(mapa)
-                    # print("path para a resolução: "+str(spi.path))
-                    keys = ''.join(spi.path)
-                    await solution.put(keys)
-                    break
-                else:
-                    if is_deadlock(mapa, spi.map):
-                        continue
-                    else:
-                        pushes = valid_pushes(mapa, spi.map)
-                        for push in pushes:
-                            aux  = copy.deepcopy(spi)
-                            sp = SearchPath(aux.map, aux.path) 
-                            sp.updateMapa(mapa, push)
-                            paths.add(sp)
+            push = Push(mapa)
+            p = SearchProblem(push, mapa.__getstate__(), get_mapa_goal(mapa))
+            t = SearchTree(p, 'breadth')
+            keys = t.search()
+            await solution.put(''.join(keys))
+            
 
 
-    async def agent_loop(puzzle,solution, server_address="localhost:8001", agent_name="student"):
+    async def agent_loop(puzzle,solution, server_address="localhost:8000", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
@@ -225,7 +206,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8001")
+    PORT = os.environ.get("PORT", "8000")
     NAME = os.environ.get("NAME", getpass.getuser())
 
     puzzle = asyncio.Queue(loop=loop)

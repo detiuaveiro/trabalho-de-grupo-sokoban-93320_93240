@@ -97,7 +97,6 @@ class SearchTree:
 
     # procurar a solucao
     def search(self, limit = None):
-
         while self.open_nodes != []:
             node = self.open_nodes.pop(0)
             if self.problem.goal_test(node.state):
