@@ -156,20 +156,21 @@ def main():
         while True:
             game_properties = await puzzle.get()
             mapa = Map(game_properties["map"])
-            #print(mapa)
+            print(mapa)
 
             push = Push(mapa)
-            p = SearchProblem(push, mapa.__getstate__(), get_mapa_goal(mapa))
+            sp = SearchPath(mapa, [])
+            p = SearchProblem(push, sp, get_mapa_goal(mapa))
             t = SearchTree(p, 'breadth')
 
             ## juntar os caminhos
-
-            # keys = t.search()
-            # await solution.put(''.join(keys))
+            keys = t.search()
+            print(keys)
+            await solution.put(''.join(keys))
             
 
 
-    async def agent_loop(puzzle,solution, server_address="localhost:8000", agent_name="student"):
+    async def agent_loop(puzzle,solution, server_address="localhost:8001", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
@@ -209,7 +210,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8000")
+    PORT = os.environ.get("PORT", "8001")
     NAME = os.environ.get("NAME", getpass.getuser())
 
     puzzle = asyncio.Queue(loop=loop)
