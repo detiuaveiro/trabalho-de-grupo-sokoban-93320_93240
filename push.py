@@ -15,35 +15,45 @@ class Push(SearchDomain):
     # lista de accoes possiveis num estado
     def actions(self, state):
         boxes = state.mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL])
-        pushes = set()
-        aux = [Tiles.BOX, Tiles.BOX_ON_GOAL, Tiles.WALL]
+        pushes = []
+        aux = [Tiles.BOX, Tiles.BOX_ON_GOAL]
+        aux1 = aux + [Tiles.WALL]
         #print(mapa.keeper)
         for box in boxes:
             adj_tiles = adjacent_tiles(state.mapa, box)
-            if adj_tiles[0] not in aux:
-                if adj_tiles[2] not in aux:
-                    pushes.add((box, 's'))
-            if adj_tiles[1] not in aux:
-                if adj_tiles[3] not in aux:
-                    pushes.add((box, 'd'))
-            if adj_tiles[2] not in aux:
-                if adj_tiles[0] not in aux:
-                    pushes.add((box, 'w'))
-            if adj_tiles[3] not in aux:
-                if adj_tiles[1] not in aux:
-                    pushes.add((box, 'a'))
-        aux = set()
+            adj_coords = adjacent_coords(box)
+            if not state.mapa.get_tile(adj_coords[0]) in aux1:
+                if not state.mapa.is_blocked(adj_coords[2]) and adj_tiles[2] not in aux:
+                    pushes.append((box, 's'))
+            if not state.mapa.get_tile(adj_coords[1]) in aux1:
+                if not state.mapa.is_blocked(adj_coords[3]) and adj_tiles[3] not in aux:
+                    pushes.append((box, 'd'))
+            if not state.mapa.get_tile(adj_coords[2]) in aux1:
+                if not state.mapa.is_blocked(adj_coords[0]) and adj_tiles[0] not in aux:
+                    pushes.append((box, 'w'))
+            if not state.mapa.get_tile(adj_coords[3]) in aux1:
+                if not state.mapa.is_blocked(adj_coords[1]) and adj_tiles[2] not in aux:
+                    pushes.append((box, 'a'))
+        
+        
+        aux = []
         for push in pushes: 
             newstate = self.result(state, push)
             if not is_deadlock(newstate.mapa):
-                aux.add(push)
-        return list(aux)
+                aux.append(push)
+
+
+        # print(state.mapa)
+        # print(aux)
+        # exit(0)
+        return aux
 
     # resultado de uma accao num estado, ou seja, o estado seguinte
     def result(self, state, action):
         # action[0] = coords da caixa
         # action[1] = direção do push
         mapa = copy.deepcopy(state.mapa)
+        newpushes = copy.deepcopy(state.pushes)
         x,y = action[0] #coords da box
 
         ##apaga o keeper anterior
@@ -80,7 +90,9 @@ class Push(SearchDomain):
             mapa.clear_tile((x,y))
             mapa.set_tile((x,y),Tiles.MAN)
 
-        return SearchPath(mapa, state.pushes)
+        newpushes.append(action)
+
+        return SearchPath(mapa, newpushes)
 
     # custo de uma accao num estado
     def cost(self, state, action):
@@ -123,10 +135,23 @@ def adjacent_coords(pos):
     # 0-> up, 1-> right, 2-> down, 3-> left, clockwise
     return [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)]
 
+def keeper_destination(move):
+    x, y = move[0]
+    if move[1] == 'w': #up
+        keeperDest = (x, y + 1)      
+    elif move[1] == 'd': #right
+        keeperDest = (x - 1,y)
+    elif move[1] == 's':   #down
+        keeperDest = (x, y - 1)
+    elif move[1] == 'a':   #left
+        keeperDest = (x + 1,y)
+    return keeperDest
+
 def is_deadlock(mapa):
     # boxes out goal
     bogs = mapa.filter_tiles([Tiles.BOX])
     boxes = mapa.filter_tiles([Tiles.BOX_ON_GOAL, Tiles.BOX])
+    # print(boxes)
 
     for bog in bogs:
         if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] - 1)) or \
@@ -142,6 +167,7 @@ def is_deadlock(mapa):
 
         for box in boxes:
             if box in coords:
+                # print("estou aqui!")
                 if box in [coords[0], coords[2]]:
                     if box in [coords[0]]:
                         if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0] - 1, bog[1] - 1)) or mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)):
@@ -157,4 +183,53 @@ def is_deadlock(mapa):
                         if mapa.is_blocked((bog[0], bog[1] - 1)) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)) or mapa.is_blocked((bog[0], bog[1] + 1)) and mapa.is_blocked((bog[0] + 1, bog[1] + 1)):
                             return True
     return False
+
+# def unreachable(mapa, push):
+#     xk, yk = mapa.keeper
+#     xkd, ykd = keeper_destination(push)
+#     box = push[0]
+
+#     line_dir = get_line_dir(keeper_destination(push), box)
+#     center = box
+#     print("center: " + str(center))
+#     size = mapa.size
+#     print("size: " + str(size))
+#     print("size[aux]: "+ str(size[aux]))
+#     print("line dir: " + str(line_dir))
+
+#     if line_dir == 'hor':
+#         for i in range(center[aux], 0 , -1):
+#             if not mapa.is_blocked((center[aux], i)) and mapa.get_tile((center[aux], i)) not in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
+#                 return False
+
+
+
+#     for i in range(center[aux] - 1, 0 , -1):
+#         print("i: " + str(i))
+#         print("position_to_be_checked: " + str((center[opp(aux)], i)))
+#         print("mapa.get_tile((center[aux], i))" + str(mapa.get_tile((center[aux], i))))
+#         print("mapa.get_tile((center[aux], i)) not in [Tiles.Box]" + str(mapa.get_tile((center[aux], i)) not in [Tiles.BOX]))
+#         if not mapa.is_blocked((center[aux], i)) and mapa.get_tile((center[aux], i)) not in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
+#             return False
+
+#     for j in range(center[aux], size[aux]):
+#         print(j)
+#         if not mapa.is_blocked((center[aux], j)):
+#             return False
+#     return True
+
+# def opp(aux):
+#     if aux == 1:
+#         return 0
+#     return 1
+    
+    
+# def get_line_dir(keeper, box):
+#     x, y = keeper
+#     x1, y1 = box
+#     if x1 != x:
+#         return 'ver'
+#     elif y1 != y:
+#         return 'hor'
+    
 

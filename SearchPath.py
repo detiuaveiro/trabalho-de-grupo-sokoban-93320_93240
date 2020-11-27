@@ -14,16 +14,12 @@ class SearchPath:
 
     def __str__(self):
         sp_str = "["
-        for m in self.path:
-            sp_str+=m
+        for p in self.pushes:
+            sp_str+= str(p)
         return sp_str+"]"
 
     def __hash__(self):
         return hash(self.mapa.map)
-    
-    @property
-    def map(self):
-        return self._map
 
     def updateMapa(self, mapa, push):
         #atualizar o mapa com a nova direçao q foi adicionada ao array path

@@ -16,16 +16,29 @@ class Map:
         self._map = []
         self._level = filename
         self._keeper = None
+        # simplified map
+        self._smap = []             # preciso _antes do atributo 
+        # list of adjcent free tiles
+        self.aftiles = []
 
         with open(filename, "r") as f:
             for line in f:
                 codedline = []
+                codedline_aux = []
                 for c in line.rstrip():
                     assert c in TILES, f"Invalid character '{c}' in map file"
                     tile = TILES[c]
+                    tile_aux = tile
+                    if tile_aux in [Tiles.MAN, Tiles.GOAL, Tiles.MAN_ON_GOAL]:
+                        tile_aux = Tiles.FLOOR
+                    elif tile_aux in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
+                        tile_aux = Tiles.WALL
+                        
                     codedline.append(tile)
+                    codedline_aux.append(tile_aux)
 
                 self._map.append(codedline)
+                self.smap.append(codedline_aux)
 
         self.hor_tiles, self.ver_tiles = (
             max([len(line) for line in self._map]),
@@ -35,7 +48,9 @@ class Map:
         # Add extra tiles to make the map a rectangule
         for y, line in enumerate(self._map):
             while len(line) < self.hor_tiles:
-                self._map[y].append(Tiles.FLOOR)
+                self._map[y].append(Tiles.WALL)
+                self.smap[y].append(Tiles.WALL)
+
 
     def __str__(self):
         map_str = ""
@@ -63,6 +78,21 @@ class Map:
         return self._map
 
     @property
+    def smap(self):
+        return self._smap
+
+    @property
+    def str_smap(self):
+        map_str = ""
+        screen = {tile: symbol for symbol, tile in TILES.items()}
+        for line in self._smap:
+            for tile in line:
+                map_str += screen[tile]
+            map_str += "\n"
+
+        return map_str.strip()
+
+    @property
     def size(self):
         """Size of map."""
         return self.hor_tiles, self.ver_tiles
@@ -86,11 +116,14 @@ class Map:
             ],
         )
 
-    def filter_tiles(self, list_to_filter):
+    def filter_tiles(self, list_to_filter, smap=False):
         """Util to retrieve list of coordinates of given tiles."""
+        mapa = self._map
+        if smap == True:
+            mapa = self._smap
         return [
             (x, y)
-            for y, l in enumerate(self._map)
+            for y, l in enumerate(mapa)
             for x, tile in enumerate(l)
             if tile in list_to_filter
         ]
