@@ -146,8 +146,6 @@ def decode_moves(lstates):
                 print("decode_moves: erro")
     return moves
 
-def get_mapa_goal(mapa):
-    pass
 
     # await asyncio.sleep(0)
 
@@ -160,7 +158,7 @@ def main():
 
             push = Push(mapa)
             sp = SearchPath(mapa, [])
-            p = SearchProblem(push, sp, get_mapa_goal(mapa))
+            p = SearchProblem(push, sp, None)
             t = SearchTree(p, 'breadth')
 
             ## juntar os caminhos

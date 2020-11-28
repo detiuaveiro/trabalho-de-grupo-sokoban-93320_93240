@@ -7,4 +7,8 @@ from consts import Tiles, TILES
 import copy
 
 
-mapa = Map("../levels/1.xsb")
+mapa = Map("../levels/12.xsb")
+
+print(mapa.str_smap)
+
+print("mapa.aftiles: " + str(mapa.aftiles))

@@ -3,6 +3,7 @@ from consts import Tiles, TILES
 import math
 import copy
 from SearchPath import *
+from mapa import Map
 
 class Push(SearchDomain):
     # construtor
@@ -19,6 +20,37 @@ class Push(SearchDomain):
         aux = [Tiles.BOX, Tiles.BOX_ON_GOAL]
         aux1 = aux + [Tiles.WALL]
         #print(mapa.keeper)
+
+        # print(state.mapa)
+        # print(state.mapa.map)
+        # print(state.mapa.aftiles)
+        # print(state.mapa.smap)
+        # print(state.mapa.aftiles)
+
+        boxess = []
+
+        aftiles = state.mapa.aftiles
+        print(aftiles)
+
+        for aft in aftiles:
+            print("aft: " + str(aft))
+            print(state.mapa.keeper)
+            if state.mapa.keeper in aft:
+                print(boxes)
+                for box in boxes:
+                    print(box)
+                    adj_tiles = adjacent_coords(box)
+                    print(adj_tiles)
+                    for adj in adj_tiles:
+                        if adj in aft:
+                            boxess.append(box)
+                            break
+            break
+
+        print(boxess)
+
+        boxes = boxess
+
         for box in boxes:
             adj_tiles = adjacent_tiles(state.mapa, box)
             adj_coords = adjacent_coords(box)
@@ -44,7 +76,7 @@ class Push(SearchDomain):
 
 
         # print(state.mapa)
-        # print(aux)
+        print(aux)
         # exit(0)
         return aux
 
@@ -53,6 +85,7 @@ class Push(SearchDomain):
         # action[0] = coords da caixa
         # action[1] = direção do push
         mapa = copy.deepcopy(state.mapa)
+        mapa_str = copy.deepcopy(state.mapa.map)
         newpushes = copy.deepcopy(state.pushes)
         x,y = action[0] #coords da box
 
@@ -92,7 +125,7 @@ class Push(SearchDomain):
 
         newpushes.append(action)
 
-        return SearchPath(mapa, newpushes)
+        return SearchPath(Map("", mapa=mapa.map, smap=state.mapa.smap), newpushes)
 
     # custo de uma accao num estado
     def cost(self, state, action):

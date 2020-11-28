@@ -24,7 +24,7 @@ class Map:
         self._smap = smap             # preciso _antes do atributo 
 
         #map, smap either are [] or both of them is vailid
-        if mapa == []: 
+        if self._map == []: 
             with open(filename, "r") as f:
                 for line in f:
                     codedline = []
@@ -53,7 +53,12 @@ class Map:
             for y, line in enumerate(self._map):
                 while len(line) < self.hor_tiles:
                     self._map[y].append(Tiles.WALL)
-                    self.smap[y].append(Tiles.WALL)
+                    self._smap[y].append(Tiles.WALL)
+        else:
+            self.hor_tiles, self.ver_tiles = (
+                max([len(line) for line in self._map]),
+                len(self._map),
+            )  # X, Y
 
         # list of adjcent free tiles
         self.aftiles = self.generate_aftiles()
@@ -187,31 +192,88 @@ class Map:
         return False
 
     def generate_aftiles(self):
-        # free tiles
-        ftiles = self.filter_tiles([Tiles.FLOOR])
+        ftiles = self.filter_tiles([Tiles.FLOOR], smap=True)
 
-        return self.rec_generate_aftiles(ftiles)
+        print('free tiles: ' + str(ftiles))
 
-    def rec_generate_aftiles(self, ftiles):
-        if ftiles == []:
-            return []
-        tile = ftiles.pop(0)
-        # adjacent coord
-        acoords = adjacent_coords(tile)
-        aftiles = [t for t in ftiles if t in acoords]
-        aftiles.append(tile)
+        aftiles = []
 
-        ftiles = list(filter(lambda tile: tile not in aftiles, ftiles))
+        # print(aftiles[aux])
 
-        rec_ftiles = self.rec_generate_aftiles(ftiles)
+        # singular adj free tiles
+        saft = []
+
+        while(1):
+            # print("treee")
+            if ftiles == []:
+               break
+            lst = []
+            tile = ftiles.pop()
+
+            adj_tiles = adjacent_coords(tile)
+            
+            for adj in adj_tiles:
+                if adj in ftiles:
+                    # print("aux: " + str(aux))
+                    # print(aftiles[aux])
+                    lst.append(adj)
+                    ftiles.remove(adj)
+            lst.append(tile)
+            # print(aftiles)
+            saft.append(lst)
+
+        print("saft: " + str(saft))
+
+        change_flag = 1
+
+        while(change_flag):
+            
+            change_flag = 0
+            for i in range(len(saft)):
+                for j in range(i + 1, len(saft) - 1):
+                    if aux(saft[i], saft[j]):
+                        saft[i].extend(saft[j])
+                        saft.remove(saft[j])
+                        saft.append([])
+                        change_flag = 1
+
+        aftiles = saft
+            
+        aftiles = list(filter(lambda x: x != [], aftiles))
+
+        return aftiles
+
+    #     # free tiles
+    #     ftiles = self.filter_tiles([Tiles.FLOOR])
+
+    #     return self.rec_generate_aftiles(ftiles)
+
+    # def rec_generate_aftiles(self, ftiles):
+    #     if ftiles == []:
+    #         return []
+    #     tile = ftiles.pop(0)
+    #     # adjacent coord
+    #     acoords = adjacent_coords(tile)
+    #     aftiles = [t for t in ftiles if t in acoords]
+    #     aftiles.append(tile)
+
+    #     ftiles = list(filter(lambda tile: tile not in aftiles, ftiles))
+
+    #     rec_ftiles = self.rec_generate_aftiles(ftiles)
         
-        for rt in rec_ftiles:
-            if any(map(lambda x: x in aftiles), rt):
-                aftiles.append(rt)
-                return aftiles
-        return aftiles.extend(rec_ftiles) 
+    #     for rt in rec_ftiles:
+    #         if any(map(lambda x: x in aftiles), rt):
+    #             aftiles.append(rt)
+    #             return aftiles
+    #     return aftiles.extend(rec_ftiles) 
         
-
+def aux(l1, l2):
+    for l in l1:
+        adj_tiles = adjacent_coords(l)
+        for ll in l2:
+            if ll in adj_tiles:
+                return True
+    return False
 
 def adjacent_coords(pos):
     x, y = pos
