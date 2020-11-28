@@ -12,44 +12,51 @@ logger.setLevel(logging.DEBUG)
 class Map:
     """Representation of a Map."""
 
-    def __init__(self, filename):
-        self._map = []
+    def __init__(self, filename, mapa=None, smap=None):
+        if mapa == None:
+            mapa = []
+        self._map = mapa
         self._level = filename
         self._keeper = None
+        if smap == None:
+            smap = []
         # simplified map
-        self._smap = []             # preciso _antes do atributo 
+        self._smap = smap             # preciso _antes do atributo 
+
+        #map, smap either are [] or both of them is vailid
+        if mapa == []: 
+            with open(filename, "r") as f:
+                for line in f:
+                    codedline = []
+                    codedline_aux = []
+                    for c in line.rstrip():
+                        assert c in TILES, f"Invalid character '{c}' in map file"
+                        tile = TILES[c]
+                        tile_aux = tile
+                        if tile_aux in [Tiles.MAN, Tiles.GOAL, Tiles.MAN_ON_GOAL]:
+                            tile_aux = Tiles.FLOOR
+                        elif tile_aux in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
+                            tile_aux = Tiles.WALL
+                            
+                        codedline.append(tile)
+                        codedline_aux.append(tile_aux)
+
+                    self._map.append(codedline)
+                    self.smap.append(codedline_aux)
+
+            self.hor_tiles, self.ver_tiles = (
+                max([len(line) for line in self._map]),
+                len(self._map),
+            )  # X, Y
+
+            # Add extra tiles to make the map a rectangule
+            for y, line in enumerate(self._map):
+                while len(line) < self.hor_tiles:
+                    self._map[y].append(Tiles.WALL)
+                    self.smap[y].append(Tiles.WALL)
+
         # list of adjcent free tiles
-        self.aftiles = []
-
-        with open(filename, "r") as f:
-            for line in f:
-                codedline = []
-                codedline_aux = []
-                for c in line.rstrip():
-                    assert c in TILES, f"Invalid character '{c}' in map file"
-                    tile = TILES[c]
-                    tile_aux = tile
-                    if tile_aux in [Tiles.MAN, Tiles.GOAL, Tiles.MAN_ON_GOAL]:
-                        tile_aux = Tiles.FLOOR
-                    elif tile_aux in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
-                        tile_aux = Tiles.WALL
-                        
-                    codedline.append(tile)
-                    codedline_aux.append(tile_aux)
-
-                self._map.append(codedline)
-                self.smap.append(codedline_aux)
-
-        self.hor_tiles, self.ver_tiles = (
-            max([len(line) for line in self._map]),
-            len(self._map),
-        )  # X, Y
-
-        # Add extra tiles to make the map a rectangule
-        for y, line in enumerate(self._map):
-            while len(line) < self.hor_tiles:
-                self._map[y].append(Tiles.WALL)
-                self.smap[y].append(Tiles.WALL)
+        self.aftiles = self.generate_aftiles()
 
 
     def __str__(self):
@@ -178,6 +185,38 @@ class Map:
             logger.debug("Position is a wall")
             return True
         return False
+
+    def generate_aftiles(self):
+        # free tiles
+        ftiles = self.filter_tiles([Tiles.FLOOR])
+
+        return self.rec_generate_aftiles(ftiles)
+
+    def rec_generate_aftiles(self, ftiles):
+        if ftiles == []:
+            return []
+        tile = ftiles.pop(0)
+        # adjacent coord
+        acoords = adjacent_coords(tile)
+        aftiles = [t for t in ftiles if t in acoords]
+        aftiles.append(tile)
+
+        ftiles = list(filter(lambda tile: tile not in aftiles, ftiles))
+
+        rec_ftiles = self.rec_generate_aftiles(ftiles)
+        
+        for rt in rec_ftiles:
+            if any(map(lambda x: x in aftiles), rt):
+                aftiles.append(rt)
+                return aftiles
+        return aftiles.extend(rec_ftiles) 
+        
+
+
+def adjacent_coords(pos):
+    x, y = pos
+    # 0-> up, 1-> right, 2-> down, 3-> left, clockwise
+    return [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)]
 
 
 if __name__ == "__main__":
