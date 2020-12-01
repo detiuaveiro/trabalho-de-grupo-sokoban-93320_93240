@@ -42,7 +42,7 @@ class Map:
                         codedline_aux.append(tile_aux)
 
                     self._map.append(codedline)
-                    self.smap.append(codedline_aux)
+                    self._smap.append(codedline_aux)
 
             self.hor_tiles, self.ver_tiles = (
                 max([len(line) for line in self._map]),
@@ -52,7 +52,7 @@ class Map:
             # Add extra tiles to make the map a rectangule
             for y, line in enumerate(self._map):
                 while len(line) < self.hor_tiles:
-                    self._map[y].append(Tiles.WALL)
+                    self._map[y].append(Tiles.FLOOR)
                     self._smap[y].append(Tiles.WALL)
         else:
             self.hor_tiles, self.ver_tiles = (
@@ -60,6 +60,13 @@ class Map:
                 len(self._map),
             )  # X, Y
 
+        for line in self._smap:
+            for i in range(len(line)):
+                if line[i] == Tiles.WALL:
+                    for y in range(0,i):
+                        line[y] = Tiles.WALL
+                    break
+        
         # list of adjcent free tiles
         self.aftiles = self.generate_aftiles()
 
@@ -163,11 +170,14 @@ class Map:
         x, y = pos
         return self._map[y][x]
 
-    def set_tile(self, pos, tile):
+    def set_tile(self, pos, tile, smap=False):
         """Set the tile at position pos to tile."""
+        mapa = self._map
+        if smap == True:
+            mapa = self._smap
         x, y = pos
-        self._map[y][x] = (
-            tile & 0b1110 | self._map[y][x]
+        mapa[y][x] = (
+            tile & 0b1110 | mapa[y][x]
         )  # the 0b1110 mask avoid carring ON_GOAL to new tiles
 
         if (
@@ -175,10 +185,13 @@ class Map:
         ):  # hack to avoid continuous searching for keeper
             self._keeper = pos
 
-    def clear_tile(self, pos):
+    def clear_tile(self, pos, smap=False):
         """Remove mobile entity from pos."""
+        mapa = self._map
+        if smap == True:
+            mapa = self._smap
         x, y = pos
-        self._map[y][x] = self._map[y][x] & 0b1  # lesser bit carries ON_GOAL
+        mapa[y][x] = mapa[y][x] & 0b1  # lesser bit carries ON_GOAL
 
     def is_blocked(self, pos):
         """Determine if mobile entity can be placed at pos."""
@@ -194,7 +207,7 @@ class Map:
     def generate_aftiles(self):
         ftiles = self.filter_tiles([Tiles.FLOOR], smap=True)
 
-        print('free tiles: ' + str(ftiles))
+        #print('free tiles: ' + str(ftiles))
 
         aftiles = []
 
@@ -222,7 +235,7 @@ class Map:
             # print(aftiles)
             saft.append(lst)
 
-        print("saft: " + str(saft))
+        #print("saft: " + str(saft))
 
         change_flag = 1
 

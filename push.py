@@ -7,8 +7,8 @@ from mapa import Map
 
 class Push(SearchDomain):
     # construtor
-    def __init__(self, mapa):
-        self.mapa =  mapa
+    def __init__(self, m):
+        self.m =  m
 
     # state = instancia de SearchPath
     # action = pushes possíveis
@@ -30,27 +30,34 @@ class Push(SearchDomain):
         boxess = []
 
         aftiles = state.mapa.aftiles
-        print(aftiles)
+        # print("--------------------------------------------------")
+        # print(aftiles)
+        # print("MAPA: ")
+        # print(state.mapa)
+        # print(state.mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL]))
 
         for aft in aftiles:
-            print("aft: " + str(aft))
-            print(state.mapa.keeper)
+            # print("aft: " + str(aft))
+            # print(state.mapa.keeper)
+            # print(state.mapa.str_smap)
             if state.mapa.keeper in aft:
-                print(boxes)
+                #print(boxes)
                 for box in boxes:
-                    print(box)
+                    # print("box")
+                    # print(box)
                     adj_tiles = adjacent_coords(box)
-                    print(adj_tiles)
+                    # print("tiles")
+                    # print(adj_tiles)
+                    # print("----")
                     for adj in adj_tiles:
                         if adj in aft:
                             boxess.append(box)
                             break
             break
 
-        print(boxess)
+        #print(boxess)
 
         boxes = boxess
-
         for box in boxes:
             adj_tiles = adjacent_tiles(state.mapa, box)
             adj_coords = adjacent_coords(box)
@@ -76,7 +83,7 @@ class Push(SearchDomain):
 
 
         # print(state.mapa)
-        print(aux)
+        #print(aux)
         # exit(0)
         return aux
 
@@ -85,9 +92,13 @@ class Push(SearchDomain):
         # action[0] = coords da caixa
         # action[1] = direção do push
         mapa = copy.deepcopy(state.mapa)
-        mapa_str = copy.deepcopy(state.mapa.map)
+        newSmap = copy.deepcopy(state.mapa.smap)
+        mapa._smap = newSmap
         newpushes = copy.deepcopy(state.pushes)
         x,y = action[0] #coords da box
+        # print("|||||||||||||||||||")
+        # print(mapa)
+        # print(mapa.str_smap)
 
         ##apaga o keeper anterior
         if(mapa.get_tile(mapa.keeper) == Tiles.MAN_ON_GOAL):
@@ -114,6 +125,9 @@ class Push(SearchDomain):
         else:
             mapa.clear_tile(coords)
             mapa.set_tile(coords,Tiles.BOX)
+        
+        mapa.clear_tile(coords,smap=True)
+        mapa.set_tile(coords,Tiles.WALL,smap=True)
 
         ##substitui a caixa pelo keeper 
         if(mapa.get_tile((x,y)) == Tiles.BOX_ON_GOAL):
@@ -123,9 +137,12 @@ class Push(SearchDomain):
             mapa.clear_tile((x,y))
             mapa.set_tile((x,y),Tiles.MAN)
 
+        mapa.clear_tile((x,y),smap=True)
+        mapa.set_tile((x,y),Tiles.FLOOR,smap=True)
+
         newpushes.append(action)
 
-        return SearchPath(Map("", mapa=mapa.map, smap=state.mapa.smap), newpushes)
+        return SearchPath(Map("", mapa=mapa.map, smap=mapa.smap), newpushes)
 
     # custo de uma accao num estado
     def cost(self, state, action):
