@@ -4,13 +4,13 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir) 
 from mapa import Map
 from path import *
+from SearchPath import *
+from push import *
 
-mapa = Map("../levels/3.xsb")
+mapa = Map("../levels/12.xsb")
 
-map = mapa.__getstate__()
+sp = SearchPath(mapa, [])
 
-p = Path(mapa, map)
+p = Push(sp.mapa)
 
-print(mapa)
-print(mapa.keeper)
-print(p.actions((3, 4)))
+print(p.actions(sp))

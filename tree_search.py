@@ -1,3 +1,4 @@
+import asyncio
 
 # Module: tree_search
 # 
@@ -96,8 +97,9 @@ class SearchTree:
         return (path)
 
     # procurar a solucao
-    def search(self, limit = None):
+    async def search(self, limit = None):
         while self.open_nodes != []:
+            await asyncio.sleep(0)
             node = self.open_nodes.pop(0)
             if self.problem.goal_test(node.state):
                 self.solution = node        # 1.3, estranho, python deixa criar atributos de classe fora do construtor

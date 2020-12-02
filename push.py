@@ -32,13 +32,15 @@ class Push(SearchDomain):
         aftiles = state.mapa.aftiles
         # print("--------------------------------------------------")
         # print(aftiles)
-        # print("MAPA: ")
-        # print(state.mapa)
+        print("MAPA: ")
+        print(state.mapa)
+        print(state.mapa.str_smap)
+        print(aftiles)
         # print(state.mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL]))
 
         for aft in aftiles:
             # print("aft: " + str(aft))
-            # print(state.mapa.keeper)
+            print("keeper: " + str(state.mapa.keeper))
             # print(state.mapa.str_smap)
             if state.mapa.keeper in aft:
                 #print(boxes)
@@ -51,39 +53,51 @@ class Push(SearchDomain):
                     # print("----")
                     for adj in adj_tiles:
                         if adj in aft:
-                            boxess.append(box)
-                            break
-            break
+                            boxess.append((box, adj))
+                break
+
+        print(boxess)
+
+        for boxs in boxess:
+            dir_s = get_direction(boxs[1], boxs[0])
+            coords_tile2check = next_tile(boxs[0], dir_s)
+            if not state.mapa.is_blocked(coords_tile2check, smap=True):
+            # print(boxs)
+            # print(dir_s)
+                pushes.append((boxs[0], dir_s))
+
+        # print(pushes)
 
         #print(boxess)
 
-        boxes = boxess
-        for box in boxes:
-            adj_tiles = adjacent_tiles(state.mapa, box)
-            adj_coords = adjacent_coords(box)
-            if not state.mapa.get_tile(adj_coords[0]) in aux1:
-                if not state.mapa.is_blocked(adj_coords[2]) and adj_tiles[2] not in aux:
-                    pushes.append((box, 's'))
-            if not state.mapa.get_tile(adj_coords[1]) in aux1:
-                if not state.mapa.is_blocked(adj_coords[3]) and adj_tiles[3] not in aux:
-                    pushes.append((box, 'd'))
-            if not state.mapa.get_tile(adj_coords[2]) in aux1:
-                if not state.mapa.is_blocked(adj_coords[0]) and adj_tiles[0] not in aux:
-                    pushes.append((box, 'w'))
-            if not state.mapa.get_tile(adj_coords[3]) in aux1:
-                if not state.mapa.is_blocked(adj_coords[1]) and adj_tiles[2] not in aux:
-                    pushes.append((box, 'a'))
+        # boxes = boxess
+        # for box in boxes:
+        #     adj_tiles = adjacent_tiles(state.mapa, box)
+        #     adj_coords = adjacent_coords(box)
+        #     if not state.mapa.get_tile(adj_coords[0]) in aux1:
+        #         if not state.mapa.is_blocked(adj_coords[2]) and adj_tiles[2] not in aux:
+        #             pushes.append((box, 's'))
+        #     if not state.mapa.get_tile(adj_coords[1]) in aux1:
+        #         if not state.mapa.is_blocked(adj_coords[3]) and adj_tiles[3] not in aux:
+        #             pushes.append((box, 'd'))
+        #     if not state.mapa.get_tile(adj_coords[2]) in aux1:
+        #         if not state.mapa.is_blocked(adj_coords[0]) and adj_tiles[0] not in aux:
+        #             pushes.append((box, 'w'))
+        #     if not state.mapa.get_tile(adj_coords[3]) in aux1:
+        #         if not state.mapa.is_blocked(adj_coords[1]) and adj_tiles[1] not in aux:
+        #             pushes.append((box, 'a'))
         
         
         aux = []
-        for push in pushes: 
+        for push in pushes:
+            # print(state.mapa)
             newstate = self.result(state, push)
             if not is_deadlock(newstate.mapa):
                 aux.append(push)
 
 
-        # print(state.mapa)
-        #print(aux)
+        # prin((state.mapa)
+        # print("availale pushes: " + str(aux))
         # exit(0)
         return aux
 
@@ -178,7 +192,9 @@ def adjacent_tiles(mapa,pos):
     tr = mapa.get_tile((x + 1, y))
     tu = mapa.get_tile((x, y - 1))
     td = mapa.get_tile((x, y + 1))
-    return [tl, tr, tu,td]
+
+    # up, right, down, left
+    return [tu, tr, td, tl]
 
 def adjacent_coords(pos):
     x, y = pos
@@ -196,6 +212,28 @@ def keeper_destination(move):
     elif move[1] == 'a':   #left
         keeperDest = (x + 1,y)
     return keeperDest
+
+def get_direction(c1, c2):
+    if c1[0] < c2[0]:
+        return 'd'
+    elif c1[0] > c2[0]:
+        return 'a'
+    else:
+        if c1[1] > c2[1]:
+            return 'w'
+        elif c1[1] < c2[1]:
+            return 's'
+
+def next_tile(box, dir):
+    x, y = box
+    if dir == 'w':
+        return (x, y - 1)
+    elif dir == 's':
+        return (x, y + 1)
+    elif dir == 'a':
+        return (x - 1, y)
+    elif dir == 'd':
+        return (x + 1, y)
 
 def is_deadlock(mapa):
     # boxes out goal
@@ -233,53 +271,4 @@ def is_deadlock(mapa):
                         if mapa.is_blocked((bog[0], bog[1] - 1)) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)) or mapa.is_blocked((bog[0], bog[1] + 1)) and mapa.is_blocked((bog[0] + 1, bog[1] + 1)):
                             return True
     return False
-
-# def unreachable(mapa, push):
-#     xk, yk = mapa.keeper
-#     xkd, ykd = keeper_destination(push)
-#     box = push[0]
-
-#     line_dir = get_line_dir(keeper_destination(push), box)
-#     center = box
-#     print("center: " + str(center))
-#     size = mapa.size
-#     print("size: " + str(size))
-#     print("size[aux]: "+ str(size[aux]))
-#     print("line dir: " + str(line_dir))
-
-#     if line_dir == 'hor':
-#         for i in range(center[aux], 0 , -1):
-#             if not mapa.is_blocked((center[aux], i)) and mapa.get_tile((center[aux], i)) not in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
-#                 return False
-
-
-
-#     for i in range(center[aux] - 1, 0 , -1):
-#         print("i: " + str(i))
-#         print("position_to_be_checked: " + str((center[opp(aux)], i)))
-#         print("mapa.get_tile((center[aux], i))" + str(mapa.get_tile((center[aux], i))))
-#         print("mapa.get_tile((center[aux], i)) not in [Tiles.Box]" + str(mapa.get_tile((center[aux], i)) not in [Tiles.BOX]))
-#         if not mapa.is_blocked((center[aux], i)) and mapa.get_tile((center[aux], i)) not in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
-#             return False
-
-#     for j in range(center[aux], size[aux]):
-#         print(j)
-#         if not mapa.is_blocked((center[aux], j)):
-#             return False
-#     return True
-
-# def opp(aux):
-#     if aux == 1:
-#         return 0
-#     return 1
-    
-    
-# def get_line_dir(keeper, box):
-#     x, y = keeper
-#     x1, y1 = box
-#     if x1 != x:
-#         return 'ver'
-#     elif y1 != y:
-#         return 'hor'
-    
 

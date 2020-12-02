@@ -193,8 +193,11 @@ class Map:
         x, y = pos
         mapa[y][x] = mapa[y][x] & 0b1  # lesser bit carries ON_GOAL
 
-    def is_blocked(self, pos):
+    def is_blocked(self, pos, smap=False):
         """Determine if mobile entity can be placed at pos."""
+        mapa = self._map
+        if smap == True:
+            mapa = self._smap
         x, y = pos
         if x not in range(self.hor_tiles) or y not in range(self.ver_tiles):
             logger.error("Position out of map")
