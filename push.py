@@ -32,15 +32,15 @@ class Push(SearchDomain):
         aftiles = state.mapa.aftiles
         # print("--------------------------------------------------")
         # print(aftiles)
-        print("MAPA: ")
-        print(state.mapa)
-        print(state.mapa.str_smap)
-        print(aftiles)
+        # print("MAPA: ")
+        # print(state.mapa)
+        # print(state.mapa.str_smap)
+        # print(aftiles)
         # print(state.mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL]))
 
         for aft in aftiles:
             # print("aft: " + str(aft))
-            print("keeper: " + str(state.mapa.keeper))
+            # print("keeper: " + str(state.mapa.keeper))
             # print(state.mapa.str_smap)
             if state.mapa.keeper in aft:
                 #print(boxes)
@@ -56,7 +56,7 @@ class Push(SearchDomain):
                             boxess.append((box, adj))
                 break
 
-        print(boxess)
+        # print(boxess)
 
         for boxs in boxess:
             dir_s = get_direction(boxs[1], boxs[0])
@@ -160,7 +160,7 @@ class Push(SearchDomain):
 
     # custo de uma accao num estado
     def cost(self, state, action):
-        return 1
+        return state.mapa.on_goal
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state, goal):

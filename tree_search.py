@@ -1,4 +1,5 @@
 import asyncio
+import mapa
 
 # Module: tree_search
 # 
@@ -73,6 +74,12 @@ class SearchNode:
         return "no(" + str(self.state) + "," + str(self.parent) + ")"
     def __repr__(self):
         return str(self)
+    def __hash__(self):
+        return hash(self.state)
+    def __eq__(self, other):
+        if other == None:
+            return False
+        return self.state == other.state
 
 # Arvores de pesquisa
 class SearchTree:
@@ -98,13 +105,25 @@ class SearchTree:
 
     # procurar a solucao
     async def search(self, limit = None):
+        past_states = set()
         while self.open_nodes != []:
             await asyncio.sleep(0)
             node = self.open_nodes.pop(0)
+            # print("node.state: " + str(node.state))
+            # print((node.state.mapa.map))
+            while node in past_states:
+                print("encontrei um estado igual!")
+                node = self.open_nodes.pop(0)
+            past_states.add(node)
+            # node = self.open_nodes.pop(0)
+            # while node.state.mapa.map in past_states:
+            #     node = self.open_nodes
+
             if self.problem.goal_test(node.state):
                 self.solution = node        # 1.3, estranho, python deixa criar atributos de classe fora do construtor
                 self.length = self.solution.depth
                 self.terminals = len(self.open_nodes) + 1
+                print(self.terminals)
                 # foi preciso arredondar
                 self.avg_branching = round((self.terminals + self.non_terminals -1) / (self.non_terminals if self.non_terminals != 0 else 1), 2)       # 1.6
                 self.cost = self.solution.cost  # 1.9
@@ -120,14 +139,16 @@ class SearchTree:
             
             for a in self.problem.domain.actions(node.state):
                 newstate = self.problem.domain.result(node.state, a)
-                if newstate not in self.get_path(node):         # 1.1, evitar ciclos, evitar que o algoritmo registe um nó com um state pelo qual já estivemos
-                    # print(newstate)
-                    # print(a)
-                    newnode = SearchNode(newstate,node)
-                    # print(newnode)
-                    newnode.cost = node.cost + self.problem.domain.cost(node.state, a) # 1.8
-                    newnode.heuristic = self.problem.domain.heuristic(newnode.state, self.problem.goal)
-                    lnewnodes.append(newnode)
+                # esta linha pode-se tornar desnecessária
+                #
+                # if newstate not in self.get_path(node):         # 1.1, evitar ciclos, evitar que o algoritmo registe um nó com um state pelo qual já estivemos
+                # print(newstate)
+                # print(a)
+                newnode = SearchNode(newstate,node)
+                # print(newnode)
+                newnode.cost = node.cost + self.problem.domain.cost(node.state, a) # 1.8
+                newnode.heuristic = self.problem.domain.heuristic(newnode.state, self.problem.goal)
+                lnewnodes.append(newnode)
             # print(lnewnodes)
             self.add_to_open(lnewnodes)
         return None
@@ -141,6 +162,7 @@ class SearchTree:
         # pesquisa uniforme: a escolha do nó depende do menor custo acumulado desde o nó raiz
         elif self.strategy == 'uniform': # # 1.10 objectivo, manter os open_nodes, os nós abertos, ordenados pelo menor caminho
             self.open_nodes.extend(lnewnodes)
+            self.open_nodes = list(set(self.open_nodes))
             self.open_nodes = sorted(self.open_nodes, key=sorter, reverse=False)
         # pesquisa greedy: a escolha do nó seguinte depende da menor heuristica(estimativa para atingir o resultado)
         elif self.strategy == 'greedy': # 1.13
@@ -148,6 +170,8 @@ class SearchTree:
             self.open_nodes = sorted(self.open_nodes, key=sorter_heuristic, reverse=False)
         elif self.strategy == "a*":
             self.open_nodes.extend(lnewnodes)
+            # self.open_nodes = list(set(self.open_nodes))
+            # print(self.open_nodes)
             self.open_nodes = sorted(self.open_nodes, key=sorter_astar)
 
 

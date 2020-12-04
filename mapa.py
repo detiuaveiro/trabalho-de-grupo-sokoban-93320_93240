@@ -81,6 +81,15 @@ class Map:
 
         return map_str.strip()
 
+    def __hash__(self):
+        # print("hash em mapa.py")
+        aux = list(map(lambda x: tuple(x), self.map))
+        # print(tuple(aux))
+        return hash(tuple(aux))
+
+    def __eq__(self, other):
+        return self.map == other.map
+
     def __getstate__(self):
         return self._map
 
