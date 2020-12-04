@@ -105,16 +105,16 @@ class SearchTree:
 
     # procurar a solucao
     async def search(self, limit = None):
-        past_states = set()
+        # past_states = set()
         while self.open_nodes != []:
             await asyncio.sleep(0)
             node = self.open_nodes.pop(0)
             # print("node.state: " + str(node.state))
             # print((node.state.mapa.map))
-            while node in past_states:
-                print("encontrei um estado igual!")
-                node = self.open_nodes.pop(0)
-            past_states.add(node)
+            # while node in past_states:
+            #     print("encontrei um estado igual!")
+            #     node = self.open_nodes.pop(0)
+            # past_states.add(node)
             # node = self.open_nodes.pop(0)
             # while node.state.mapa.map in past_states:
             #     node = self.open_nodes

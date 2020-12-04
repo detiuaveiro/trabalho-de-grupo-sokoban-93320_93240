@@ -5,6 +5,8 @@ import copy
 from SearchPath import *
 from mapa import Map
 
+past_states = set()
+
 class Push(SearchDomain):
     # construtor
     def __init__(self, m):
@@ -92,9 +94,12 @@ class Push(SearchDomain):
         for push in pushes:
             # print(state.mapa)
             newstate = self.result(state, push)
-            if not is_deadlock(newstate.mapa):
-                aux.append(push)
-
+            if not newstate in past_states:
+                past_states.add(newstate)
+                if not is_deadlock(newstate.mapa):
+                    aux.append(push)
+            else:
+                print("encontrei um estado igual!")
 
         # prin((state.mapa)
         # print("availale pushes: " + str(aux))
@@ -160,7 +165,7 @@ class Push(SearchDomain):
 
     # custo de uma accao num estado
     def cost(self, state, action):
-        return state.mapa.on_goal
+        return len(state.mapa.empty_goals)
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state, goal):
