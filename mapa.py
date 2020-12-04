@@ -267,6 +267,49 @@ class Map:
         aftiles = list(filter(lambda x: x != [], aftiles))
 
         return aftiles
+    
+    # def smapPrunning(self):
+    #     smap2 = copy.deepcopy(self.smap)    #novo mapa semelhante ao smap mas que avalia apenas os pushes validos para as caixas
+
+    #     vertsInit = [self.map[x][1] for x in range(self.ver_tiles)]
+    #     vertsEnd = [self.map[x][self.hor_tiles-2] for x in range(self.ver_tiles)]
+    #     print(vertsInit)
+    #     print(vertsInit)
+    #     print("horizontais")
+    #     print(self.map[1])
+
+    #     print(self.ver_tiles)
+    #     print(self.hor_tiles)
+
+    
+    #     flag = False
+    #     # # horizontais
+    #     # if not self.map[1].__contains__(Tiles.GOAL):
+    #     #     for x in range(self.ver_tiles):
+    #     #         self._smap2[1][x] = Tiles.WALL 
+    #     #     if self.map[1].__contains__(Tiles.MAN):
+    #     #         flag = True # adicionar coords do keeper aftiles
+
+    #     # if not self.map[self.ver_tiles-3].__contains__(Tiles.GOAL):
+    #     #     for x in range(self.ver_tiles):
+    #     #         self._smap2[self.ver_tiles-3][x] = Tiles.WALL 
+    #     #     if self.map[self.ver_tiles-3].__contains__(Tiles.MAN):
+    #     #         flag = True # adicionar coords do keeper aftiles
+
+    #     # #vertical
+    #     # if not vertsInit.__contains__(Tiles.GOAL):
+    #     #     for line in self._smap2:
+    #     #         line[1] = Tiles.WALL 
+    #     #     if vertsInit.__contains__(Tiles.MAN):
+    #     #         flag = True # adicionar coords do keeper aftiles
+
+    #     # if not vertsEnd.__contains__(Tiles.GOAL):
+    #     #     for line in self._smap2:
+    #     #         line[self.ver_tiles] = Tiles.WALL 
+    #     #     if vertsEnd.__contains__(Tiles.MAN):
+    #     #         flag = True # adicionar coords do keeper aftiles
+
+    #     return flag
 
     #     # free tiles
     #     ftiles = self.filter_tiles([Tiles.FLOOR])

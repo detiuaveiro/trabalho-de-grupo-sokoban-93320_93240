@@ -7,6 +7,7 @@ class Path(SearchDomain):
     def __init__(self, mapa, map):
         self.mapa = mapa            # mapa objecto
         self.map = map              # map string
+        self.past_states = set()
 
     
     # state, estado -> coordenadas do keeper (x, y)
@@ -25,7 +26,14 @@ class Path(SearchDomain):
             valid.append("s")
         if self.mapa.get_tile((x,y-1)) not in [Tiles.BOX, Tiles.WALL, Tiles.BOX_ON_GOAL]:
             valid.append("w")
-        return valid
+
+        aux = []
+        for v in valid:
+            nextState = self.result(currPos,v)
+            if not nextState in self.past_states:
+                self.past_states.add(nextState)
+                aux.append(v)               
+        return aux
 
     # resultado de uma accao num estado, ou seja, o estado seguinte
     # coordenadas do estado seguinte, mediante a move

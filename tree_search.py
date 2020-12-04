@@ -63,7 +63,7 @@ class SearchProblem:
         return self.domain.satisfies(state,self.goal)
 
 # Nos de uma arvore de pesquisa
-class SearchNode:
+class SearchNode:  
     def __init__(self,state,parent): 
         self.state = state
         self.parent = parent
@@ -80,6 +80,7 @@ class SearchNode:
         if other == None:
             return False
         return self.state == other.state
+    
 
 # Arvores de pesquisa
 class SearchTree:

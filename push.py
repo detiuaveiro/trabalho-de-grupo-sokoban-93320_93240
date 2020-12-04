@@ -9,14 +9,15 @@ past_states = set()
 
 class Push(SearchDomain):
     # construtor
-    def __init__(self, m):
-        self.m =  m
+    def __init__(self):
+        self.past_states = set()
 
     # state = instancia de SearchPath
     # action = pushes possíveis
 
     # lista de accoes possiveis num estado
     def actions(self, state):
+        self.past_states.add(state) 
         boxes = state.mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL])
         pushes = []
         aux = [Tiles.BOX, Tiles.BOX_ON_GOAL]
@@ -67,43 +68,17 @@ class Push(SearchDomain):
             # print(boxs)
             # print(dir_s)
                 pushes.append((boxs[0], dir_s))
-
-        # print(pushes)
-
-        #print(boxess)
-
-        # boxes = boxess
-        # for box in boxes:
-        #     adj_tiles = adjacent_tiles(state.mapa, box)
-        #     adj_coords = adjacent_coords(box)
-        #     if not state.mapa.get_tile(adj_coords[0]) in aux1:
-        #         if not state.mapa.is_blocked(adj_coords[2]) and adj_tiles[2] not in aux:
-        #             pushes.append((box, 's'))
-        #     if not state.mapa.get_tile(adj_coords[1]) in aux1:
-        #         if not state.mapa.is_blocked(adj_coords[3]) and adj_tiles[3] not in aux:
-        #             pushes.append((box, 'd'))
-        #     if not state.mapa.get_tile(adj_coords[2]) in aux1:
-        #         if not state.mapa.is_blocked(adj_coords[0]) and adj_tiles[0] not in aux:
-        #             pushes.append((box, 'w'))
-        #     if not state.mapa.get_tile(adj_coords[3]) in aux1:
-        #         if not state.mapa.is_blocked(adj_coords[1]) and adj_tiles[1] not in aux:
-        #             pushes.append((box, 'a'))
-        
         
         aux = []
         for push in pushes:
             # print(state.mapa)
             newstate = self.result(state, push)
-            if not newstate in past_states:
-                past_states.add(newstate)
+            if not newstate in self.past_states:
                 if not is_deadlock(newstate.mapa):
+                    self.past_states.add(newstate)
                     aux.append(push)
-            else:
-                print("encontrei um estado igual!")
-
-        # prin((state.mapa)
-        # print("availale pushes: " + str(aux))
-        # exit(0)
+            #else:
+                #print("encontrei um estado igual!")
         return aux
 
     # resultado de uma accao num estado, ou seja, o estado seguinte
