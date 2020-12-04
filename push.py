@@ -32,15 +32,15 @@ class Push(SearchDomain):
         aftiles = state.mapa.aftiles
         # print("--------------------------------------------------")
         # print(aftiles)
-        print("MAPA: ")
-        print(state.mapa)
-        print(state.mapa.str_smap)
-        print(aftiles)
+        # print("MAPA: ")
+        # print(state.mapa)
+        # print(state.mapa.str_smap)
+        # print(aftiles)
         # print(state.mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL]))
 
         for aft in aftiles:
             # print("aft: " + str(aft))
-            print("keeper: " + str(state.mapa.keeper))
+            #print("keeper: " + str(state.mapa.keeper))
             # print(state.mapa.str_smap)
             if state.mapa.keeper in aft:
                 #print(boxes)
@@ -69,24 +69,6 @@ class Push(SearchDomain):
         # print(pushes)
 
         #print(boxess)
-
-        # boxes = boxess
-        # for box in boxes:
-        #     adj_tiles = adjacent_tiles(state.mapa, box)
-        #     adj_coords = adjacent_coords(box)
-        #     if not state.mapa.get_tile(adj_coords[0]) in aux1:
-        #         if not state.mapa.is_blocked(adj_coords[2]) and adj_tiles[2] not in aux:
-        #             pushes.append((box, 's'))
-        #     if not state.mapa.get_tile(adj_coords[1]) in aux1:
-        #         if not state.mapa.is_blocked(adj_coords[3]) and adj_tiles[3] not in aux:
-        #             pushes.append((box, 'd'))
-        #     if not state.mapa.get_tile(adj_coords[2]) in aux1:
-        #         if not state.mapa.is_blocked(adj_coords[0]) and adj_tiles[0] not in aux:
-        #             pushes.append((box, 'w'))
-        #     if not state.mapa.get_tile(adj_coords[3]) in aux1:
-        #         if not state.mapa.is_blocked(adj_coords[1]) and adj_tiles[1] not in aux:
-        #             pushes.append((box, 'a'))
-        
         
         aux = []
         for push in pushes:
@@ -201,18 +183,6 @@ def adjacent_coords(pos):
     # 0-> up, 1-> right, 2-> down, 3-> left, clockwise
     return [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)]
 
-def keeper_destination(move):
-    x, y = move[0]
-    if move[1] == 'w': #up
-        keeperDest = (x, y + 1)      
-    elif move[1] == 'd': #right
-        keeperDest = (x - 1,y)
-    elif move[1] == 's':   #down
-        keeperDest = (x, y - 1)
-    elif move[1] == 'a':   #left
-        keeperDest = (x + 1,y)
-    return keeperDest
-
 def get_direction(c1, c2):
     if c1[0] < c2[0]:
         return 'd'
@@ -255,7 +225,6 @@ def is_deadlock(mapa):
 
         for box in boxes:
             if box in coords:
-                # print("estou aqui!")
                 if box in [coords[0], coords[2]]:
                     if box in [coords[0]]:
                         if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0] - 1, bog[1] - 1)) or mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)):

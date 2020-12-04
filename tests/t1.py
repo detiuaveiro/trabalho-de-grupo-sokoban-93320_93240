@@ -5,7 +5,7 @@ sys.path.insert(0, parent_dir)
 from mapa import Map
 from consts import Tiles, TILES
 
-mapa = Map("../levels/12.xsb")
+mapa = Map("../levels/19.xsb")
 
 print(mapa)
 

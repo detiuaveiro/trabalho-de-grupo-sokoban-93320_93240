@@ -15,105 +15,46 @@ from path import *
 import sys
 from push import *
 
-def adjacent_coords(pos):
-    x, y = pos
-    # 0-> up, 1-> right, 2-> down, 3-> left, clockwise
-    return [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)]
-
-def complete(mapa, map):
-    mapa.__setstate__(map)
-    return mapa.completed
-
-def adjacent_tiles(mapa,pos):
-    x, y = pos
-
-    tl = mapa.get_tile((x - 1, y))
-    tr = mapa.get_tile((x + 1, y))
-    tu = mapa.get_tile((x, y - 1))
-    td = mapa.get_tile((x, y + 1))
-
-    return [tu, tr, td, tl] # up, right, down, left, clockwise
     
-def is_deadlock(mapa, map):
-    # boxes out goal
-    mapa.__setstate__(map)
+# def valid_pushes(mapa, map):
+#     mapa.__setstate__(map)
+#     boxes = mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL])
+#     possible_pushes = []
+#     pushes = []
+#     aux = [Tiles.BOX, Tiles.BOX_ON_GOAL]
+#     aux1 = aux + [Tiles.WALL]
+#     #print(mapa.keeper)
+#     for box in boxes:
+#         # print("-----------------im in valid_pushes---------------")
+#         adj_coords = adjacent_coords(box)
+#         adj_tiles = adjacent_tiles(mapa, box)
+#         if not mapa.get_tile(adj_coords[0]) in aux1:
+#             if not mapa.is_blocked(adj_coords[2]) and adj_tiles[2] not in aux:
+#                 possible_pushes.append((box, 's'))
+#         if not mapa.get_tile(adj_coords[1]) in aux1:
+#             if not mapa.is_blocked(adj_coords[3]) and adj_tiles[3] not in aux:
+#                 possible_pushes.append((box, 'd'))
+#         if not mapa.get_tile(adj_coords[2]) in aux1:
+#             if not mapa.is_blocked(adj_coords[0]) and adj_tiles[0] not in aux:
+#                 possible_pushes.append((box, 'w'))
+#         if not mapa.get_tile(adj_coords[3]) in aux1:
+#             if not mapa.is_blocked(adj_coords[1]) and adj_tiles[2] not in aux:
+#                 possible_pushes.append((box, 'a'))
 
-    bogs = mapa.filter_tiles([Tiles.BOX])
-    boxes = mapa.filter_tiles([Tiles.BOX_ON_GOAL, Tiles.BOX])
-
-    for bog in bogs:
-        if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] - 1)) or \
-        mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] - 1)) or \
-        mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] + 1)) or \
-        mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] + 1)):
-            return True
-
-        tiles = adjacent_tiles(mapa, bog)
-        coords = adjacent_coords(bog)
-
-        boxes.remove(bog)
-
-        for box in boxes:
-            if box in coords:
-                if box in [coords[0], coords[2]]:
-                    if box in [coords[0]]:
-                        if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0] - 1, bog[1] - 1)) or mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)):
-                            return True
-                    else:
-                        if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0] - 1, bog[1] + 1)) or mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0] + 1, bog[1] + 1)):
-                            return True
-                else:
-                    if box in [coords[3]]:
-                        if mapa.is_blocked((bog[0], bog[1] - 1)) and mapa.is_blocked((bog[0] - 1, bog[1] - 1)) or mapa.is_blocked((bog[0], bog[1] + 1)) and mapa.is_blocked((bog[0] - 1, bog[1] + 1)):
-                            return True
-                    else:
-                        if mapa.is_blocked((bog[0], bog[1] - 1)) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)) or mapa.is_blocked((bog[0], bog[1] + 1)) and mapa.is_blocked((bog[0] + 1, bog[1] + 1)):
-                            return True
-    return False
-
-# TODO: escolher as caixas: 2 hipoteses..1)distancia manhattan 2) caixa c + nº validPushes 1º e em caso de empate (distancia de manhattan)
-# move[0] = coords da caixa
-# move[1] = direção
-# path -> pathBetween
-def valid_pushes(mapa, map):
-    mapa.__setstate__(map)
-    boxes = mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL])
-    possible_pushes = []
-    pushes = []
-    aux = [Tiles.BOX, Tiles.BOX_ON_GOAL]
-    aux1 = aux + [Tiles.WALL]
-    #print(mapa.keeper)
-    for box in boxes:
-        # print("-----------------im in valid_pushes---------------")
-        adj_coords = adjacent_coords(box)
-        adj_tiles = adjacent_tiles(mapa, box)
-        if not mapa.get_tile(adj_coords[0]) in aux1:
-            if not mapa.is_blocked(adj_coords[2]) and adj_tiles[2] not in aux:
-                possible_pushes.append((box, 's'))
-        if not mapa.get_tile(adj_coords[1]) in aux1:
-            if not mapa.is_blocked(adj_coords[3]) and adj_tiles[3] not in aux:
-                possible_pushes.append((box, 'd'))
-        if not mapa.get_tile(adj_coords[2]) in aux1:
-            if not mapa.is_blocked(adj_coords[0]) and adj_tiles[0] not in aux:
-                possible_pushes.append((box, 'w'))
-        if not mapa.get_tile(adj_coords[3]) in aux1:
-            if not mapa.is_blocked(adj_coords[1]) and adj_tiles[2] not in aux:
-                possible_pushes.append((box, 'a'))
-
-    for push in possible_pushes:
-        pathDomain = Path(mapa, map)
-        keeper_dest = keeper_destination(push)
-        # print("mapa.keeper na função valid_pushes: " + str(mapa.keeper))
-        # print(mapa)
-        p = SearchProblem(pathDomain, mapa.keeper, keeper_dest)
-        t = SearchTree(p, 'a*')
-        lstates = t.search(limit=20)
-        if lstates is not None:
-            path = decode_moves(lstates)
-            if path == ['d', 's', 'a']:
-                sys.exit()
-            pushes.append((push, path))
-    return pushes
+#     for push in possible_pushes:
+#         pathDomain = Path(mapa, map)
+#         keeper_dest = keeper_destination(push)
+#         # print("mapa.keeper na função valid_pushes: " + str(mapa.keeper))
+#         # print(mapa)
+#         p = SearchProblem(pathDomain, mapa.keeper, keeper_dest)
+#         t = SearchTree(p, 'a*')
+#         lstates = t.search(limit=20)
+#         if lstates is not None:
+#             path = decode_moves(lstates)
+#             if path == ['d', 's', 'a']:
+#                 sys.exit()
+#             pushes.append((push, path))
+#     return pushes
 
 def keeper_destination(move):
     x, y = move[0]
@@ -182,7 +123,7 @@ def main():
             
 
 
-    async def agent_loop(puzzle,solution, server_address="localhost:8000", agent_name="student"):
+    async def agent_loop(puzzle,solution, server_address="localhost:8001", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
@@ -222,7 +163,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8000")
+    PORT = os.environ.get("PORT", "8001")
     NAME = os.environ.get("NAME", getpass.getuser())
 
     puzzle = asyncio.Queue(loop=loop)

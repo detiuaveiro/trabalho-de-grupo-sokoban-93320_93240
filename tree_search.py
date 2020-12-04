@@ -147,7 +147,7 @@ class SearchTree:
             self.open_nodes.extend(lnewnodes)
             self.open_nodes = sorted(self.open_nodes, key=sorter_heuristic, reverse=False)
         elif self.strategy == "a*":
-            self.open_nodes.extend(lnewnodes)
+            self.open_nodes.extend(lnewnodes)   #converter openNOdes pra set e dps novamente pra list e no final sorted()
             self.open_nodes = sorted(self.open_nodes, key=sorter_astar)
 
 

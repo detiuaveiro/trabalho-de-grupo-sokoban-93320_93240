@@ -7,7 +7,7 @@ from path import *
 from SearchPath import *
 from push import *
 
-mapa = Map("../levels/12.xsb")
+mapa = Map("../levels/19.xsb")
 
 sp = SearchPath(mapa, [])
 

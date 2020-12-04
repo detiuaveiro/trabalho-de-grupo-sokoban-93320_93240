@@ -6,7 +6,7 @@ from mapa import Map
 from consts import Tiles, TILES
 import copy
 
-mapa = Map("../levels/1.xsb")
+mapa = Map("../levels/19.xsb")
 
 mapa2 = Map("", mapa=copy.deepcopy(mapa.map), smap=mapa.smap)
 

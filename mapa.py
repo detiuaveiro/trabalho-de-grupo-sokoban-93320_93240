@@ -66,10 +66,9 @@ class Map:
                     for y in range(0,i):
                         line[y] = Tiles.WALL
                     break
-        
+
         # list of adjcent free tiles
         self.aftiles = self.generate_aftiles()
-
 
     def __str__(self):
         map_str = ""
@@ -209,7 +208,6 @@ class Map:
 
     def generate_aftiles(self):
         ftiles = self.filter_tiles([Tiles.FLOOR], smap=True)
-
         #print('free tiles: ' + str(ftiles))
 
         aftiles = []
@@ -220,7 +218,6 @@ class Map:
         saft = []
 
         while(1):
-            # print("treee")
             if ftiles == []:
                break
             lst = []
@@ -259,30 +256,48 @@ class Map:
 
         return aftiles
 
-    #     # free tiles
-    #     ftiles = self.filter_tiles([Tiles.FLOOR])
+    # def smapPrunning(self):
 
-    #     return self.rec_generate_aftiles(ftiles)
+    #     vertsInit = [self.map[x][1] for x in range(self.ver_tiles)]
+    #     vertsEnd = [self.map[x][self.hor_tiles-2] for x in range(self.ver_tiles)]
+    #     print(vertsInit)
+    #     print(vertsInit)
+    #     print("horizontais")
+    #     print(self.map[1])
 
-    # def rec_generate_aftiles(self, ftiles):
-    #     if ftiles == []:
-    #         return []
-    #     tile = ftiles.pop(0)
-    #     # adjacent coord
-    #     acoords = adjacent_coords(tile)
-    #     aftiles = [t for t in ftiles if t in acoords]
-    #     aftiles.append(tile)
+    #     print(self.ver_tiles)
+    #     print(self.hor_tiles)
 
-    #     ftiles = list(filter(lambda tile: tile not in aftiles, ftiles))
+    
+    #     flag = False
+    #     # horizontais
+    #     if not self.map[1].__contains__(Tiles.GOAL):
+    #         for x in range(self.ver_tiles):
+    #             self._smap[1][x] = Tiles.WALL 
+    #         if self.map[1].__contains__(Tiles.MAN):
+    #             flag = True # adicionar coords do keeper aftiles
 
-    #     rec_ftiles = self.rec_generate_aftiles(ftiles)
-        
-    #     for rt in rec_ftiles:
-    #         if any(map(lambda x: x in aftiles), rt):
-    #             aftiles.append(rt)
-    #             return aftiles
-    #     return aftiles.extend(rec_ftiles) 
-        
+    #     if not self.map[self.ver_tiles-3].__contains__(Tiles.GOAL):
+    #         for x in range(self.ver_tiles):
+    #             self._smap[self.ver_tiles-3][x] = Tiles.WALL 
+    #         if self.map[self.ver_tiles-3].__contains__(Tiles.MAN):
+    #             flag = True # adicionar coords do keeper aftiles
+
+    #     #vertical
+    #     if not vertsInit.__contains__(Tiles.GOAL):
+    #         for line in self._smap:
+    #             line[1] = Tiles.WALL 
+    #         if vertsInit.__contains__(Tiles.MAN):
+    #             flag = True # adicionar coords do keeper aftiles
+
+    #     if not vertsEnd.__contains__(Tiles.GOAL):
+    #         for line in self._smap:
+    #             line[self.ver_tiles] = Tiles.WALL 
+    #         if vertsEnd.__contains__(Tiles.MAN):
+    #             flag = True # adicionar coords do keeper aftiles
+
+    #     return flag
+
 def aux(l1, l2):
     for l in l1:
         adj_tiles = adjacent_coords(l)
