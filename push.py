@@ -140,7 +140,11 @@ class Push(SearchDomain):
 
     # custo de uma accao num estado
     def cost(self, state, action):
-        return len(state.mapa.empty_goals)
+        return len(state.mapa.empty_goals) # -> apartir do 60 [3000] SCORE (9, 807, 185, 6410, 0)
+        # return 0 -> apartir do 60 [3000] SCORE (5, 457, 111, 4885, 0)
+
+
+
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state, goal):
