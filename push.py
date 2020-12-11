@@ -86,8 +86,7 @@ class Push(SearchDomain):
         # action[0] = coords da caixa
         # action[1] = direção do push
         mapa = copy.deepcopy(state.mapa)
-        newSmap = copy.deepcopy(state.mapa.smap)
-        mapa._smap = newSmap
+        mapa._smap = copy.deepcopy(state.mapa.smap)
         newpushes = copy.deepcopy(state.pushes)
         x,y = action[0] #coords da box
         # print("|||||||||||||||||||")
@@ -136,15 +135,22 @@ class Push(SearchDomain):
 
         newpushes.append(action)
 
-        return SearchPath(Map("", mapa=mapa.map, smap=mapa.smap), newpushes)
+        return SearchPath(Map("", mapa=mapa.map, smap=mapa._smap), newpushes)
 
     # custo de uma accao num estado
     def cost(self, state, action):
-        return len(state.mapa.empty_goals) # -> apartir do 60 [3000] SCORE (9, 807, 185, 6410, 0)
+        # return len(state.mapa.empty_goals) + len(state.pushes) [3000] # -> apartir do 60 SCORE (4, 368, 70, 3933, 0)
+        # return len(state.mapa.empty_goals) # -> apartir do 60 [3000] SCORE (9, 807, 185, 6410, 0)
         # return 0 -> apartir do 60 [3000] SCORE (5, 457, 111, 4885, 0)
 
+        # return len(state.mapa.empty_goals) + heuristica * 10 -> apartir do 60 [3000] SCORE (9, 807, 189, 8134, 0)
+        # return len(state.mapa.empty_goals) + heuristica * 3 -> apartir do 60 [3000] SCORE (9, 821, 187, 6328, 0)
+        # return len(state.mapa.empty_goals) * 3 -> apartir do 60 [3000] SCORE (9, 815, 185, 8034, 0)
+        # return len(state.mapa.empty_goals) * 2 - apartir do 60 [3000] SCORE (9, 815, 185, 7111, 0)
+        # return len(state.pushes) -> apartir do 60 [3000] SCORE (4, 368, 70, 3980, 0)
+        # return len(state.mapa.empty_goals) * 5 + len(state.pushes) -> apartir do 60 [3000] SCORE (9, 815, 185, 8385, 0)
 
-
+        return len(state.mapa.empty_goals)
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state, goal):
