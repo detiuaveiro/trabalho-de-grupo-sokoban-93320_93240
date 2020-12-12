@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 class Map:
     """Representation of a Map."""
 
-    def __init__(self, filename, mapa=None, smap=None):
+    def __init__(self, filename, mapa=None, smap=None,pmap=None):
         if mapa == None:
             mapa = []
         self._map = mapa
@@ -20,15 +20,19 @@ class Map:
         self._keeper = None
         if smap == None:
             smap = []
+        if pmap == None:
+            pmap = []
         # simplified map
         self._smap = smap             # preciso _antes do atributo 
+        self._pmap = pmap             #mapa abstraido de caixas q permite limitar algumas moves de caixas
 
-        #map, smap either are [] or both of them is vailid
+        #map, smap either are [] or both of them is valid
         if self._map == []: 
             with open(filename, "r") as f:
                 for line in f:
                     codedline = []
                     codedline_aux = []
+                    codedline_aux2 = []
                     for c in line.rstrip():
                         assert c in TILES, f"Invalid character '{c}' in map file"
                         tile = TILES[c]
@@ -40,9 +44,11 @@ class Map:
                             
                         codedline.append(tile)
                         codedline_aux.append(tile_aux)
+                        codedline_aux2.append(tile_aux)
 
                     self._map.append(codedline)
                     self._smap.append(codedline_aux)
+                    self._pmap.append(codedline_aux2)
 
             self.hor_tiles, self.ver_tiles = (
                 max([len(line) for line in self._map]),
@@ -54,6 +60,7 @@ class Map:
                 while len(line) < self.hor_tiles:
                     self._map[y].append(Tiles.FLOOR)
                     self._smap[y].append(Tiles.WALL)
+                    self._pmap[y].append(Tiles.WALL)
         else:
             self.hor_tiles, self.ver_tiles = (
                 max([len(line) for line in self._map]),
@@ -66,7 +73,44 @@ class Map:
                     for y in range(0,i):
                         line[y] = Tiles.WALL
                     break
-        
+
+        for line in self._pmap:
+            for i in range(len(line)):
+                if line[i] == Tiles.WALL:
+                    for y in range(0,i):
+                        line[y] = Tiles.WALL
+                    break
+
+        vertsInit = [self.map[x][1] for x in range(self.ver_tiles)]
+        vertsEnd = [self.map[x][self.hor_tiles-2] for x in range(self.ver_tiles)]
+
+        # print(vertsInit)
+        # print(vertsEnd)
+        # print()
+        # print("horizontais")
+        # print(self.map[1])
+        # print(self.ver_tiles)
+        # print(self.hor_tiles)
+
+        #TODO: GOAL E BOX ON GOAL NE???
+        # horizontais
+        if not self.map[1].__contains__(Tiles.GOAL) and not self.map[1].__contains__(Tiles.BOX_ON_GOAL):
+            for x in range(self.hor_tiles):
+                self._pmap[1][x] = Tiles.WALL 
+
+        if not self.map[self.ver_tiles-2].__contains__(Tiles.GOAL) and not self.map[self.ver_tiles-2].__contains__(Tiles.BOX_ON_GOAL): 
+            for x in range(self.hor_tiles):
+                self._pmap[self.ver_tiles-2][x] = Tiles.WALL 
+
+        #vertical
+        if not vertsInit.__contains__(Tiles.GOAL) and not vertsInit.__contains__(Tiles.BOX_ON_GOAL):
+            for line in self._pmap:
+                line[1] = Tiles.WALL 
+        if not vertsEnd.__contains__(Tiles.GOAL) and not vertsEnd.__contains__(Tiles.BOX_ON_GOAL):
+            for line in self._pmap:
+                line[self.hor_tiles-2] = Tiles.WALL 
+
+
         # list of adjcent free tiles
         self.aftiles = self.generate_aftiles()
 
@@ -107,11 +151,22 @@ class Map:
     def smap(self):
         return self._smap
 
-    @property
+    @property   #TODO: BASTA UMA FUNCAO PRA GERAR OS toStrings!!!!!!!!!!!!!!!!!!!!!!
     def str_smap(self):
         map_str = ""
         screen = {tile: symbol for symbol, tile in TILES.items()}
         for line in self._smap:
+            for tile in line:
+                map_str += screen[tile]
+            map_str += "\n"
+
+        return map_str.strip()
+    
+    @property
+    def str_pmap(self):
+        map_str = ""
+        screen = {tile: symbol for symbol, tile in TILES.items()}
+        for line in self._pmap:
             for tile in line:
                 map_str += screen[tile]
             map_str += "\n"

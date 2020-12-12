@@ -1,5 +1,6 @@
 import asyncio
 import mapa
+import bisect
 
 # Module: tree_search
 # 
@@ -80,7 +81,10 @@ class SearchNode:
         if other == None:
             return False
         return self.state == other.state
-    
+    def __gt__(self,other):
+        return sorter_astar(self) > sorter_astar(other)
+    def __lt__(self,other):
+        return sorter_astar(self) < sorter_astar(other)
 
 # Arvores de pesquisa
 class SearchTree:
@@ -171,10 +175,10 @@ class SearchTree:
             self.open_nodes = sorted(self.open_nodes, key=sorter_heuristic, reverse=False)
         elif self.strategy == "a*":
             self.open_nodes.extend(lnewnodes)
-            # self.open_nodes = list(set(self.open_nodes))
-            # print(self.open_nodes)
             self.open_nodes = sorted(self.open_nodes, key=sorter_astar)
-
+        elif self.strategy == "new":
+            for x in lnewnodes:
+                bisect.insort(self.open_nodes,x)
 
 # 1.10
 def sorter(item):   # item is a node, wich is what's inside self.open_nodes
