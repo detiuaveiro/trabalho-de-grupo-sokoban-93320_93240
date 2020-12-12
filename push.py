@@ -149,7 +149,9 @@ class Push(SearchDomain):
         # return len(state.mapa.empty_goals) * 2 - apartir do 60 [3000] SCORE (9, 815, 185, 7111, 0)
         # return len(state.pushes) -> apartir do 60 [3000] SCORE (4, 368, 70, 3980, 0)
         # return len(state.mapa.empty_goals) * 5 + len(state.pushes) -> apartir do 60 [3000] SCORE (9, 815, 185, 8385, 0)
+        
 
+        #  return 1 -> apartir do 60 [3000] SCORE (9, 815, 185, 8192, 0)
         return len(state.mapa.empty_goals)
 
     # custo estimado de chegar de um estado a outro

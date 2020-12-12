@@ -124,7 +124,7 @@ class SearchTree:
                 self.solution = node        # 1.3, estranho, python deixa criar atributos de classe fora do construtor
                 self.length = self.solution.depth
                 self.terminals = len(self.open_nodes) + 1
-                print(self.terminals)
+                # print(self.terminals)
                 # foi preciso arredondar
                 self.avg_branching = round((self.terminals + self.non_terminals -1) / (self.non_terminals if self.non_terminals != 0 else 1), 2)       # 1.6
                 self.cost = self.solution.cost  # 1.9
