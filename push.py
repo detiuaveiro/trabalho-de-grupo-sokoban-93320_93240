@@ -65,19 +65,21 @@ class Push(SearchDomain):
             dir_s = get_direction(boxs[1], boxs[0])
             coords_tile2check = next_tile(boxs[0], dir_s)
             x, y = coords_tile2check
-            print("------/------")
-            print("coords_tile2check" + str(coords_tile2check))
-            print(state.mapa)
-            print()
-            print(state.mapa.str_smap)
-            print()
-            # print(state.mapa.str_pmap)
-            print("state.mapa._pmap[y][x]: " + str(state.mapa._pmap[y][x]))
-            if not (state.mapa.is_blocked(coords_tile2check, smap=True) and state.mapa.pmap[y][x] in Tiles.WALL):
+            # print("------/------")
+            # print("coords_tile2check" + str(coords_tile2check))
+            # print(state.mapa)
+            # print()
+            # print(state.mapa.str_smap)
+            # print()
+            # # print(state.mapa.str_pmap)
+            # print("state.mapa._pmap[y][x]: " + str(state.mapa._pmap[y][x]))
+            if not state.mapa.is_blocked(coords_tile2check, smap=True):
+                # print("passed 1st if")
+                if not state.mapa.pmap[y][x] in [Tiles.WALL]:
             # print(boxs)
             # print(dir_s)
-                print("append :" + str((boxs[0], dir_s)))
-                pushes.append((boxs[0], dir_s))
+                    # print("append :" + str((boxs[0], dir_s)))
+                    pushes.append((boxs[0], dir_s))
         
         aux = []
         for push in pushes:
@@ -152,10 +154,12 @@ class Push(SearchDomain):
     def cost(self, state, action):
         # return len(state.mapa.empty_goals) + len(state.pushes) [3000] # -> apartir do 60 SCORE (4, 368, 70, 3933, 0)
         # return len(state.mapa.empty_goals) # -> apartir do 60 [3000] SCORE (9, 807, 185, 6410, 0)
+        # -> [3000] SCORE (9, 807, 185, 8812, 0)
         # return 0 -> apartir do 60 [3000] SCORE (5, 457, 111, 4885, 0)
+        # [3000] SCORE (9, 807, 185, 7173, 0)
 
         # return len(state.mapa.empty_goals) + heuristica * 10 -> apartir do 60 [3000] SCORE (9, 807, 189, 8134, 0)
-        # return len(state.mapa.empty_goals) + heuristica * 3 -> apartir do 60 [3000] SCORE (9, 821, 187, 6328, 0)
+        # return len(state.mapa.empty_goals) #+ heuristica * 3 #-> apartir do 60 [3000] SCORE (9, 821, 187, 6328, 0)
         # return len(state.mapa.empty_goals) * 3 -> apartir do 60 [3000] SCORE (9, 815, 185, 8034, 0)
         # return len(state.mapa.empty_goals) * 2 - apartir do 60 [3000] SCORE (9, 815, 185, 7111, 0)
         # return len(state.pushes) -> apartir do 60 [3000] SCORE (4, 368, 70, 3980, 0)
@@ -163,7 +167,10 @@ class Push(SearchDomain):
         
         # DEBUG - [3000] SCORE (9, 807, 185, 5947, 0) -> com nova pesquisa na treeSearch "new", nivel 60
         #  return 1 -> apartir do 60 [3000] SCORE (9, 815, 185, 8192, 0)
-        return len(state.mapa.empty_goals)
+        # return len(state.mapa.empty_goals)
+
+        # best so far DEBUG - [3000] SCORE (9, 821, 187, 4683, 0) with heuristic * 3 e cost len(goals)
+        return 1
 
     # custo estimado de chegar de um estado a outro
     def heuristic(self, state, goal):
@@ -182,7 +189,8 @@ class Push(SearchDomain):
                         box = b
             dist[box] = (min_dist,g)   
      
-        return sum(n for _, n in dist)
+        return (sum(n for _, n in dist) + len(goals))**2
+        # + len(goals)**2
 
     def satisfies(self, state, goal):
         return state.mapa.completed

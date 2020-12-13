@@ -109,10 +109,12 @@ class SearchTree:
         return (path)
 
     # procurar a solucao
-    async def search(self, limit = None):
+    async def search(self, limit = None, sleep=True):
         # past_states = set()
+
         while self.open_nodes != []:
-            await asyncio.sleep(0)
+            if sleep:
+                await asyncio.sleep(0)
             node = self.open_nodes.pop(0)
             # print("node.state: " + str(node.state))
             # print((node.state.mapa.map))

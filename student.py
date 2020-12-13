@@ -58,7 +58,7 @@ def main():
                 pathDomain = Path(keys[i].mapa, keys[i].mapa.map)
                 p = SearchProblem(pathDomain, keys[i].mapa.keeper, keeper_destination(keys[i+1].pushes[len(keys[i+1].pushes)-1]))
                 t = SearchTree(p, 'new')
-                lstates = await t.search()
+                lstates = await t.search(sleep=False)
                 if lstates is not None:
                     percurso.extend(decode_moves(lstates))
                 percurso.append(keys[i+1].pushes[len(keys[i+1].pushes)-1][1])
