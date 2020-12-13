@@ -37,14 +37,16 @@ class Map:
                         assert c in TILES, f"Invalid character '{c}' in map file"
                         tile = TILES[c]
                         tile_aux = tile
+                        tile_aux2 = tile_aux
                         if tile_aux in [Tiles.MAN, Tiles.GOAL, Tiles.MAN_ON_GOAL]:
                             tile_aux = Tiles.FLOOR
                         elif tile_aux in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
                             tile_aux = Tiles.WALL
+                            tile_aux2 = Tiles.FLOOR
                             
                         codedline.append(tile)
                         codedline_aux.append(tile_aux)
-                        codedline_aux2.append(tile_aux)
+                        codedline_aux2.append(tile_aux2)
 
                     self._map.append(codedline)
                     self._smap.append(codedline_aux)
