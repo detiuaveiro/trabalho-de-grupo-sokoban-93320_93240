@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 class Map:
     """Representation of a Map."""
 
-    def __init__(self, filename, mapa=None, smap=None,pmap=None):
+    def __init__(self, filename, mapa=None, smap=None, pmap=None):
         if mapa == None:
             mapa = []
         self._map = mapa
@@ -39,6 +39,8 @@ class Map:
                         tile_aux = tile
                         tile_aux2 = tile_aux
                         if tile_aux in [Tiles.MAN, Tiles.GOAL, Tiles.MAN_ON_GOAL]:
+                            if tile_aux in [Tiles.MAN]:
+                                tile_aux2 = Tiles.FLOOR
                             tile_aux = Tiles.FLOOR
                         elif tile_aux in [Tiles.BOX, Tiles.BOX_ON_GOAL]:
                             tile_aux = Tiles.WALL
@@ -63,56 +65,69 @@ class Map:
                     self._map[y].append(Tiles.FLOOR)
                     self._smap[y].append(Tiles.WALL)
                     self._pmap[y].append(Tiles.WALL)
-        else:
-            self.hor_tiles, self.ver_tiles = (
-                max([len(line) for line in self._map]),
-                len(self._map),
-            )  # X, Y
 
-        for line in self._smap:
-            for i in range(len(line)):
-                if line[i] == Tiles.WALL:
-                    for y in range(0,i):
-                        line[y] = Tiles.WALL
-                    break
+            vertsInit = [self.map[x][1] for x in range(self.ver_tiles)]
+            vertsEnd = [self.map[x][self.hor_tiles-2] for x in range(self.ver_tiles)]
 
-        for line in self._pmap:
-            for i in range(len(line)):
-                if line[i] == Tiles.WALL:
-                    for y in range(0,i):
-                        line[y] = Tiles.WALL
-                    break
+            #TODO: GOAL E BOX ON GOAL NE???
+            # horizontais
+            if not self.map[1].__contains__(Tiles.GOAL) and not self.map[1].__contains__(Tiles.BOX_ON_GOAL):
+                for x in range(self.hor_tiles):
+                    self._pmap[1][x] = Tiles.WALL 
 
-        vertsInit = [self.map[x][1] for x in range(self.ver_tiles)]
-        vertsEnd = [self.map[x][self.hor_tiles-2] for x in range(self.ver_tiles)]
+            if not self.map[self.ver_tiles-2].__contains__(Tiles.GOAL) and not self.map[self.ver_tiles-2].__contains__(Tiles.BOX_ON_GOAL): 
+                for x in range(self.hor_tiles):
+                    self._pmap[self.ver_tiles-2][x] = Tiles.WALL 
 
-        # print(vertsInit)
-        # print(vertsEnd)
-        # print()
-        # print("horizontais")
-        # print(self.map[1])
-        # print(self.ver_tiles)
-        # print(self.hor_tiles)
+            #vertical
+            if not vertsInit.__contains__(Tiles.GOAL) and not vertsInit.__contains__(Tiles.BOX_ON_GOAL):
+                for line in self._pmap:
+                    line[1] = Tiles.WALL 
+            if not vertsEnd.__contains__(Tiles.GOAL) and not vertsEnd.__contains__(Tiles.BOX_ON_GOAL):
+                for line in self._pmap:
+                    line[self.hor_tiles-2] = Tiles.WALL
 
-        #TODO: GOAL E BOX ON GOAL NE???
-        # horizontais
-        if not self.map[1].__contains__(Tiles.GOAL) and not self.map[1].__contains__(Tiles.BOX_ON_GOAL):
-            for x in range(self.hor_tiles):
-                self._pmap[1][x] = Tiles.WALL 
 
-        if not self.map[self.ver_tiles-2].__contains__(Tiles.GOAL) and not self.map[self.ver_tiles-2].__contains__(Tiles.BOX_ON_GOAL): 
-            for x in range(self.hor_tiles):
-                self._pmap[self.ver_tiles-2][x] = Tiles.WALL 
+            for line in self._smap:
+                for i in range(len(line)):
+                    if line[i] == Tiles.WALL:
+                        for y in range(0,i):
+                            line[y] = Tiles.WALL
+                        break
 
-        #vertical
-        if not vertsInit.__contains__(Tiles.GOAL) and not vertsInit.__contains__(Tiles.BOX_ON_GOAL):
             for line in self._pmap:
-                line[1] = Tiles.WALL 
-        if not vertsEnd.__contains__(Tiles.GOAL) and not vertsEnd.__contains__(Tiles.BOX_ON_GOAL):
-            for line in self._pmap:
-                line[self.hor_tiles-2] = Tiles.WALL 
+                for i in range(len(line)):
+                    if line[i] == Tiles.WALL:
+                        for y in range(0,i):
+                            line[y] = Tiles.WALL
+                        break
 
+        # vertsInit = [self.map[x][1] for x in range(self.ver_tiles)]
+        # vertsEnd = [self.map[x][self.hor_tiles-2] for x in range(self.ver_tiles)]
 
+        # #TODO: GOAL E BOX ON GOAL NE???
+        # # horizontais
+        # if not self.map[1].__contains__(Tiles.GOAL) and not self.map[1].__contains__(Tiles.BOX_ON_GOAL):
+        #     for x in range(self.hor_tiles):
+        #         self._pmap[1][x] = Tiles.WALL 
+
+        # if not self.map[self.ver_tiles-2].__contains__(Tiles.GOAL) and not self.map[self.ver_tiles-2].__contains__(Tiles.BOX_ON_GOAL): 
+        #     for x in range(self.hor_tiles):
+        #         self._pmap[self.ver_tiles-2][x] = Tiles.WALL 
+
+        # #vertical
+        # if not vertsInit.__contains__(Tiles.GOAL) and not vertsInit.__contains__(Tiles.BOX_ON_GOAL):
+        #     for line in self._pmap:
+        #         line[1] = Tiles.WALL 
+        # if not vertsEnd.__contains__(Tiles.GOAL) and not vertsEnd.__contains__(Tiles.BOX_ON_GOAL):
+        #     for line in self._pmap:
+        #         line[self.hor_tiles-2] = Tiles.WALL 
+
+        self.hor_tiles, self.ver_tiles = (
+            max([len(line) for line in self._map]),
+            len(self._map),
+        )  # X, Y
+        
         # list of adjcent free tiles
         self.aftiles = self.generate_aftiles()
 
@@ -152,6 +167,10 @@ class Map:
     @property
     def smap(self):
         return self._smap
+
+    @property
+    def pmap(self):
+        return self._pmap
 
     @property   #TODO: BASTA UMA FUNCAO PRA GERAR OS toStrings!!!!!!!!!!!!!!!!!!!!!!
     def str_smap(self):

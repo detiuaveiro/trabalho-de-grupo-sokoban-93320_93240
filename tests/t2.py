@@ -8,7 +8,23 @@ import copy
 
 mapa = Map("../levels/1.xsb")
 
-mapa2 = Map("", mapa=copy.deepcopy(mapa.map), smap=mapa.smap)
+print("mapa1")
+print(mapa)
+print("smap")
+print(mapa.str_smap)
+print("pmap")
+print(mapa.str_pmap)
+
+mapa2 = Map("", mapa=copy.deepcopy(mapa.map), smap=mapa.smap, pmap=mapa._pmap)
+
+print("mapa1")
+print(mapa2)
+print("smap")
+print(mapa2.str_smap)
+print("pmap")
+print(mapa2.str_pmap)
+
+
 
 # print(mapa2.smap)
 
@@ -18,11 +34,11 @@ mapa2 = Map("", mapa=copy.deepcopy(mapa.map), smap=mapa.smap)
 
 
 # mapa.set_tile((1, 1), Tiles.WALL)
-print(mapa)
-print(mapa.map)
-print(mapa.str_smap)
-print(mapa.aftiles)
-print(mapa2)
-print(mapa2.map)
-print(mapa2.str_smap)
-print(mapa2.aftiles)
+# print(mapa)
+# print(mapa.map)
+# print(mapa.str_smap)
+# print(mapa.aftiles)
+# print(mapa2)
+# print(mapa2.map)
+# print(mapa2.str_smap)
+# print(mapa2.aftiles)

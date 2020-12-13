@@ -64,9 +64,19 @@ class Push(SearchDomain):
         for boxs in boxess:
             dir_s = get_direction(boxs[1], boxs[0])
             coords_tile2check = next_tile(boxs[0], dir_s)
-            if not state.mapa.is_blocked(coords_tile2check, smap=True):
+            x, y = coords_tile2check
+            print("------/------")
+            print("coords_tile2check" + str(coords_tile2check))
+            print(state.mapa)
+            print()
+            print(state.mapa.str_smap)
+            print()
+            # print(state.mapa.str_pmap)
+            print("state.mapa._pmap[y][x]: " + str(state.mapa._pmap[y][x]))
+            if not (state.mapa.is_blocked(coords_tile2check, smap=True) and state.mapa.pmap[y][x] in Tiles.WALL):
             # print(boxs)
             # print(dir_s)
+                print("append :" + str((boxs[0], dir_s)))
                 pushes.append((boxs[0], dir_s))
         
         aux = []
@@ -87,6 +97,7 @@ class Push(SearchDomain):
         # action[1] = direção do push
         mapa = copy.deepcopy(state.mapa)
         mapa._smap = copy.deepcopy(state.mapa.smap)
+        mapa._pmap = copy.deepcopy(state.mapa.pmap)
         newpushes = copy.deepcopy(state.pushes)
         x,y = action[0] #coords da box
         # print("|||||||||||||||||||")
@@ -135,7 +146,7 @@ class Push(SearchDomain):
 
         newpushes.append(action)
 
-        return SearchPath(Map("", mapa=mapa.map, smap=mapa._smap), newpushes)
+        return SearchPath(Map("", mapa=mapa.map, smap=mapa._smap, pmap=mapa._pmap), newpushes)
 
     # custo de uma accao num estado
     def cost(self, state, action):
