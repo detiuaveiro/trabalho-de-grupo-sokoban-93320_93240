@@ -113,8 +113,8 @@ class SearchTree:
         # past_states = set()
 
         while self.open_nodes != []:
-            if sleep:
-                await asyncio.sleep(0)
+            # if sleep:
+            await asyncio.sleep(0)
             node = self.open_nodes.pop(0)
             # print("node.state: " + str(node.state))
             # print((node.state.mapa.map))
