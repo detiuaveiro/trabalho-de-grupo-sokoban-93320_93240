@@ -5,8 +5,6 @@ import copy
 from SearchPath import *
 from mapa import Map
 
-past_states = set()
-
 class Push(SearchDomain):
     # construtor
     def __init__(self):
@@ -22,89 +20,47 @@ class Push(SearchDomain):
         pushes = []
         aux = [Tiles.BOX, Tiles.BOX_ON_GOAL]
         aux1 = aux + [Tiles.WALL]
-        #print(mapa.keeper)
-
-        # print(state.mapa)
-        # print(state.mapa.map)
-        # print(state.mapa.aftiles)
-        # print(state.mapa.smap)
-        # print(state.mapa.aftiles)
-
         boxess = []
-
         aftiles = state.mapa.aftiles
-        # print("--------------------------------------------------")
-        # print(aftiles)
-        # print("MAPA: ")
-        # print(state.mapa)
-        # print(state.mapa.str_smap)
-        # print(aftiles)
-        # print(state.mapa.filter_tiles([Tiles.BOX, Tiles.BOX_ON_GOAL]))
 
         for aft in aftiles:
-            # print("aft: " + str(aft))
-            # print("keeper: " + str(state.mapa.keeper))
-            # print(state.mapa.str_smap)
             if state.mapa.keeper in aft:
-                #print(boxes)
                 for box in boxes:
-                    # print("box")
-                    # print(box)
                     adj_tiles = adjacent_coords(box)
-                    # print("tiles")
-                    # print(adj_tiles)
-                    # print("----")
                     for adj in adj_tiles:
                         if adj in aft:
                             boxess.append((box, adj))
                 break
 
-        # print(boxess)
-
         for boxs in boxess:
             dir_s = get_direction(boxs[1], boxs[0])
             coords_tile2check = next_tile(boxs[0], dir_s)
             x, y = coords_tile2check
-            # print("------/------")
-            # print("coords_tile2check" + str(coords_tile2check))
-            # print(state.mapa)
-            # print()
-            # print(state.mapa.str_smap)
-            # print()
-            # # print(state.mapa.str_pmap)
-            # print("state.mapa._pmap[y][x]: " + str(state.mapa._pmap[y][x]))
             if not state.mapa.is_blocked(coords_tile2check, smap=True):
-                # print("passed 1st if")
                 if not state.mapa.pmap[y][x] in [Tiles.WALL]:
-            # print(boxs)
-            # print(dir_s)
-                    # print("append :" + str((boxs[0], dir_s)))
                     pushes.append((boxs[0], dir_s))
         
         aux = []
         for push in pushes:
-            # print(state.mapa)
             newstate = self.result(state, push)
             if not newstate in self.past_states:
                 if not is_deadlock(newstate.mapa):
                     self.past_states.add(newstate)
-                    aux.append(push)
-            #else:
-                #print("encontrei um estado igual!")
-        return aux
+                    #aux.append(push)
+                    aux.append(newstate) #dar append do newstate
+        return aux #retornar os newstates
 
     # resultado de uma accao num estado, ou seja, o estado seguinte
     def result(self, state, action):
         # action[0] = coords da caixa
         # action[1] = direção do push
         mapa = copy.deepcopy(state.mapa)
-        mapa._smap = copy.deepcopy(state.mapa.smap)
-        mapa._pmap = copy.deepcopy(state.mapa.pmap)
-        newpushes = copy.deepcopy(state.pushes)
+        ## possível melhoramento
+        ## desenhar no mapa das tiles, em vez de usar o objecto mapa, assim evitava-se a linha 56 que é uma deepcopy de um objecto todo
+        #mapa._smap = copy.deepcopy(state.mapa.smap)
+        mapa._smap = [x[:] for x in state.mapa.smap]
+        newpushes = [x for x in state.pushes]
         x,y = action[0] #coords da box
-        # print("|||||||||||||||||||")
-        # print(mapa)
-        # print(mapa.str_smap)
 
         ##apaga o keeper anterior
         if(mapa.get_tile(mapa.keeper) == Tiles.MAN_ON_GOAL):
@@ -148,7 +104,7 @@ class Push(SearchDomain):
 
         newpushes.append(action)
 
-        return SearchPath(Map("", mapa=mapa.map, smap=mapa._smap, pmap=mapa._pmap), newpushes)
+        return SearchPath(Map("", mapa=mapa.map, smap=mapa._smap, pmap=state.mapa.pmap), newpushes)
 
     # custo de uma accao num estado
     def cost(self, state, action):
@@ -168,6 +124,10 @@ class Push(SearchDomain):
         # DEBUG - [3000] SCORE (9, 807, 185, 5947, 0) -> com nova pesquisa na treeSearch "new", nivel 60
         #  return 1 -> apartir do 60 [3000] SCORE (9, 815, 185, 8192, 0)
         # return len(state.mapa.empty_goals)
+        
+        #SCORE (53, 7789, 1816, 26301, 0)
+        #(53, 7789, 1816, 25623, 0) -> 60-112
+        #(13, 2548, 532, 12202, 0) 100-112
 
         # best so far DEBUG - [3000] SCORE (9, 821, 187, 4683, 0) with heuristic * 3 e cost len(goals)
         return 1
