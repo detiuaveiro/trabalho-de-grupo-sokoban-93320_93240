@@ -6,9 +6,12 @@ from mapa import Map
 from consts import Tiles, TILES
 import copy
 
+mapa = Map("../levels/75.xsb")
 
-mapa = Map("../levels/58.xsb")
-
+print("estado incial do nível 75:")
+print(mapa)
+print()
+print("_smap gerado para este estado:")
 print(mapa.str_smap)
 
 print("mapa.aftiles: " + str(mapa.aftiles))
