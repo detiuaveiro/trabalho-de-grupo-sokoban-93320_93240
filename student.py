@@ -14,6 +14,7 @@ import math
 from path import *
 import sys
 from push import *
+from tree_searchKeeper import *
 
 def decode_moves(lstates):
     moves = []
@@ -50,25 +51,18 @@ def main():
             ## juntar os caminhos
             keys = await t.search()
             for i in range(len(keys)-1):
-                # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-                # print(keys[i].mapa)
-                # print(keys[i].mapa.str_smap)
-                # print("next move: " + str(keys[i+1].pushes[len(keys[i+1].pushes)-1]))
-                # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
                 pathDomain = Path(keys[i].mapa, keys[i].mapa.map)
-                p = SearchProblem(pathDomain, keys[i].mapa.keeper, keeper_destination(keys[i+1].pushes[len(keys[i+1].pushes)-1]))
-                t = SearchTree(p, 'new')
-                lstates = await t.search(sleep=False)
+                p = SearchProblemKeeper(pathDomain, keys[i].mapa.keeper, keeper_destination(keys[i+1].pushes[len(keys[i+1].pushes)-1]))
+                t = SearchTreeKeeper(p)
+                lstates = await t.searchKeeper(sleep=False)
                 if lstates is not None:
                     percurso.extend(decode_moves(lstates))
                 percurso.append(keys[i+1].pushes[len(keys[i+1].pushes)-1][1])
-
             print(percurso)
             await solution.put(''.join(percurso))
             
 
-
-    async def agent_loop(puzzle,solution, server_address="localhost:8000", agent_name="student"):
+    async def agent_loop(puzzle,solution, server_address="localhost:8001", agent_name="student"):
         async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
             # Receive information about static game properties
@@ -109,7 +103,7 @@ def main():
     # $ NAME='arrumador' python3 client.py
     loop = asyncio.get_event_loop()
     SERVER = os.environ.get("SERVER", "localhost")
-    PORT = os.environ.get("PORT", "8000")
+    PORT = os.environ.get("PORT", "8001")
     NAME = os.environ.get("NAME", getpass.getuser())
 
     puzzle = asyncio.Queue(loop=loop)

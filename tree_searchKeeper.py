@@ -55,7 +55,7 @@ class SearchDomain(ABC):
 
 # Problemas concretos a resolver
 # dentro de um determinado dominio
-class SearchProblem:
+class SearchProblemKeeper:
     def __init__(self, domain, initial, goal):
         self.domain = domain
         self.initial = initial
@@ -87,14 +87,14 @@ class SearchNode:
         return sorter_astar(self) < sorter_astar(other)
 
 # Arvores de pesquisa
-class SearchTree:
+class SearchTreeKeeper:
 
     # construtor
-    def __init__(self,problem, strategy='breadth'): 
+    def __init__(self,problem): 
         self.problem = problem
         root = SearchNode(problem.initial, None)
         self.open_nodes = [root]
-        self.strategy = strategy
+        #self.strategy = strategy
         self.length = 0
         self.cost = 0       # 1.9
 
@@ -107,7 +107,7 @@ class SearchTree:
         return (path)
 
     # procurar a solucao
-    async def search(self, limit = None, sleep=True):
+    async def searchKeeper(self, limit = None, sleep=True):
         while self.open_nodes != []:
             # if sleep:
             await asyncio.sleep(0)
@@ -116,13 +116,36 @@ class SearchTree:
                 return self.get_path(node)
 
             #lnewnodes = []
-            for newstate in self.problem.domain.actions(node.state):
+            for a in self.problem.domain.actions(node.state):
+                newstate = self.problem.domain.result(node.state, a) #a passava a ser o newstate
                 newnode = SearchNode(newstate,node)
-                newnode.cost = node.cost + 1
+                newnode.cost = node.cost + self.problem.domain.cost(node.state, a) # substituir cost por 1
                 newnode.heuristic = self.problem.domain.heuristic(newnode.state, self.problem.goal)
+                #lnewnodes.append(newnode)
                 bisect.insort(self.open_nodes,newnode)
+            #self.add_to_open(lnewnodes)
         return None
 
+    # # juntar novos nos a lista de nós abertos de acordo com a estrategia
+    # def add_to_open(self,lnewnodes):
+    #     if self.strategy == 'breadth':
+    #         self.open_nodes.extend(lnewnodes)
+    #     elif self.strategy == 'depth':
+    #         self.open_nodes[:0] = lnewnodes
+    #     # pesquisa uniforme: a escolha do nó depende do menor custo acumulado desde o nó raiz
+    #     elif self.strategy == 'uniform': # # 1.10 objectivo, manter os open_nodes, os nós abertos, ordenados pelo menor caminho
+    #         self.open_nodes.extend(lnewnodes)
+    #         self.open_nodes = list(set(self.open_nodes))
+    #         self.open_nodes = sorted(self.open_nodes, key=sorter, reverse=False)
+    #     # pesquisa greedy: a escolha do nó seguinte depende da menor heuristica(estimativa para atingir o resultado)
+    #     elif self.strategy == 'greedy': # 1.13
+    #         self.open_nodes.extend(lnewnodes)
+    #         self.open_nodes = sorted(self.open_nodes, key=sorter_heuristic, reverse=False)
+    #     elif self.strategy == "a*":
+    #         self.open_nodes.extend(lnewnodes)
+    #         self.open_nodes = sorted(self.open_nodes, key=sorter_astar)
+
+# 1.14
 def sorter_astar(item):
     return item.cost + item.heuristic
 
