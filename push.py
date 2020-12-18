@@ -46,7 +46,6 @@ class Push(SearchDomain):
             if not newstate in self.past_states:
                 if not is_deadlock(newstate.mapa):
                     self.past_states.add(newstate)
-                    #aux.append(push)
                     aux.append(newstate) #dar append do newstate
         return aux #retornar os newstates
 
@@ -55,9 +54,6 @@ class Push(SearchDomain):
         # action[0] = coords da caixa
         # action[1] = direção do push
         mapa = copy.deepcopy(state.mapa)
-        ## possível melhoramento
-        ## desenhar no mapa das tiles, em vez de usar o objecto mapa, assim evitava-se a linha 56 que é uma deepcopy de um objecto todo
-        #mapa._smap = copy.deepcopy(state.mapa.smap)
         mapa._smap = [x[:] for x in state.mapa.smap]
         newpushes = [x for x in state.pushes]
         x,y = action[0] #coords da box
@@ -108,28 +104,6 @@ class Push(SearchDomain):
 
     # custo de uma accao num estado
     def cost(self, state, action):
-        # return len(state.mapa.empty_goals) + len(state.pushes) [3000] # -> apartir do 60 SCORE (4, 368, 70, 3933, 0)
-        # return len(state.mapa.empty_goals) # -> apartir do 60 [3000] SCORE (9, 807, 185, 6410, 0)
-        # -> [3000] SCORE (9, 807, 185, 8812, 0)
-        # return 0 -> apartir do 60 [3000] SCORE (5, 457, 111, 4885, 0)
-        # [3000] SCORE (9, 807, 185, 7173, 0)
-
-        # return len(state.mapa.empty_goals) + heuristica * 10 -> apartir do 60 [3000] SCORE (9, 807, 189, 8134, 0)
-        # return len(state.mapa.empty_goals) #+ heuristica * 3 #-> apartir do 60 [3000] SCORE (9, 821, 187, 6328, 0)
-        # return len(state.mapa.empty_goals) * 3 -> apartir do 60 [3000] SCORE (9, 815, 185, 8034, 0)
-        # return len(state.mapa.empty_goals) * 2 - apartir do 60 [3000] SCORE (9, 815, 185, 7111, 0)
-        # return len(state.pushes) -> apartir do 60 [3000] SCORE (4, 368, 70, 3980, 0)
-        # return len(state.mapa.empty_goals) * 5 + len(state.pushes) -> apartir do 60 [3000] SCORE (9, 815, 185, 8385, 0)
-        
-        # DEBUG - [3000] SCORE (9, 807, 185, 5947, 0) -> com nova pesquisa na treeSearch "new", nivel 60
-        #  return 1 -> apartir do 60 [3000] SCORE (9, 815, 185, 8192, 0)
-        # return len(state.mapa.empty_goals)
-        
-        #SCORE (53, 7789, 1816, 26301, 0)
-        #(53, 7789, 1816, 25623, 0) -> 60-112
-        #(13, 2548, 532, 12202, 0) 100-112
-
-        # best so far DEBUG - [3000] SCORE (9, 821, 187, 4683, 0) with heuristic * 3 e cost len(goals)
         return 1
 
     # custo estimado de chegar de um estado a outro
@@ -149,12 +123,10 @@ class Push(SearchDomain):
                         box = b
             dist[box] = (min_dist,g)   
      
-        return (sum(n for _, n in dist) + len(goals)**3)**2
-        # + len(goals)**2
+        return (sum(n for _, n in dist) + len(goals))**2
 
     def satisfies(self, state, goal):
         return state.mapa.completed
-
 
 def adjacent_tiles(mapa,pos):
     x, y = pos
@@ -207,10 +179,8 @@ def next_tile(box, dir):
         return (x + 1, y)
 
 def is_deadlock(mapa):
-    # boxes out goal
     bogs = mapa.filter_tiles([Tiles.BOX])
     boxes = mapa.filter_tiles([Tiles.BOX_ON_GOAL, Tiles.BOX])
-    # print(boxes)
 
     for bog in bogs:
         if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0], bog[1] - 1)) or \
@@ -226,7 +196,6 @@ def is_deadlock(mapa):
 
         for box in boxes:
             if box in coords:
-                # print("estou aqui!")
                 if box in [coords[0], coords[2]]:
                     if box in [coords[0]]:
                         if mapa.is_blocked((bog[0] - 1, bog[1])) and mapa.is_blocked((bog[0] - 1, bog[1] - 1)) or mapa.is_blocked((bog[0] + 1, bog[1])) and mapa.is_blocked((bog[0] + 1, bog[1] - 1)):
