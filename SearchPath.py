@@ -15,15 +15,8 @@ class SearchPath:
     def __str__(self):
         return str(self.mapa)
 
-    # def __repr__(self):
-    #     return str(self.mapa)
-
     def __hash__(self):
-        # print("hash em Search path")
-        # print(self.mapa)
         return hash(self.mapa)
 
     def __eq__(self, other):
         return self.mapa.__eq__(other.mapa)
-
-## http://bomberman-aulas.ws.atnog.av.it.pt/table.html

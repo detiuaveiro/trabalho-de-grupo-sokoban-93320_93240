@@ -40,13 +40,13 @@ def main():
         while True:
             game_properties = await puzzle.get()
             mapa = Map(game_properties["map"])
-            print(mapa)
+            # print(mapa)
             percurso = []
 
             push = Push()
             sp = SearchPath(mapa, [])
             p = SearchProblem(push, sp, None)
-            t = SearchTree(p, 'new')
+            t = SearchTree(p)
 
             ## juntar os caminhos
             keys = await t.search()
@@ -58,7 +58,7 @@ def main():
                 if lstates is not None:
                     percurso.extend(decode_moves(lstates))
                 percurso.append(keys[i+1].pushes[len(keys[i+1].pushes)-1][1])
-            print(percurso)
+            # print(percurso)
             await solution.put(''.join(percurso))
             
 

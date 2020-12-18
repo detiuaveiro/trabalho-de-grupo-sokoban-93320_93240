@@ -102,27 +102,6 @@ class Map:
                             line[y] = Tiles.WALL
                         break
 
-        # vertsInit = [self.map[x][1] for x in range(self.ver_tiles)]
-        # vertsEnd = [self.map[x][self.hor_tiles-2] for x in range(self.ver_tiles)]
-
-        # #TODO: GOAL E BOX ON GOAL NE???
-        # # horizontais
-        # if not self.map[1].__contains__(Tiles.GOAL) and not self.map[1].__contains__(Tiles.BOX_ON_GOAL):
-        #     for x in range(self.hor_tiles):
-        #         self._pmap[1][x] = Tiles.WALL 
-
-        # if not self.map[self.ver_tiles-2].__contains__(Tiles.GOAL) and not self.map[self.ver_tiles-2].__contains__(Tiles.BOX_ON_GOAL): 
-        #     for x in range(self.hor_tiles):
-        #         self._pmap[self.ver_tiles-2][x] = Tiles.WALL 
-
-        # #vertical
-        # if not vertsInit.__contains__(Tiles.GOAL) and not vertsInit.__contains__(Tiles.BOX_ON_GOAL):
-        #     for line in self._pmap:
-        #         line[1] = Tiles.WALL 
-        # if not vertsEnd.__contains__(Tiles.GOAL) and not vertsEnd.__contains__(Tiles.BOX_ON_GOAL):
-        #     for line in self._pmap:
-        #         line[self.hor_tiles-2] = Tiles.WALL 
-
         self.hor_tiles, self.ver_tiles = (
             max([len(line) for line in self._map]),
             len(self._map),
@@ -172,7 +151,7 @@ class Map:
     def pmap(self):
         return self._pmap
 
-    @property   #TODO: BASTA UMA FUNCAO PRA GERAR OS toStrings!!!!!!!!!!!!!!!!!!!!!!
+    @property
     def str_smap(self):
         map_str = ""
         screen = {tile: symbol for symbol, tile in TILES.items()}
@@ -343,21 +322,3 @@ def adjacent_coords(pos):
     # 0-> up, 1-> right, 2-> down, 3-> left, clockwise
     return [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)]
 
-
-if __name__ == "__main__":
-    mapa = Map("levels/1.xsb")
-    print(mapa)
-    assert mapa.keeper == (11, 8)
-    assert mapa.get_tile((4, 2)) == Tiles.WALL
-    assert mapa.get_tile((5, 2)) == Tiles.BOX
-    assert mapa.get_tile((2, 7)) == Tiles.BOX
-    assert mapa.get_tile(mapa.keeper) == Tiles.MAN
-    # Fake move:
-    mapa.clear_tile(mapa.keeper)
-    mapa.set_tile((16, 7), Tiles.MAN)
-    mapa.clear_tile((12, 7))
-    mapa.set_tile((17, 7), Tiles.BOX)
-    assert mapa.keeper == (16, 7)
-    assert mapa.get_tile((17, 7)) == Tiles.BOX_ON_GOAL
-    assert mapa.on_goal == 1
-    assert mapa.boxes == [(5, 2), (7, 3), (5, 4), (7, 4), (2, 7), (17, 7)]

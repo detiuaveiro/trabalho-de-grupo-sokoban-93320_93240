@@ -90,11 +90,10 @@ class SearchNode:
 class SearchTree:
 
     # construtor
-    def __init__(self,problem, strategy='breadth'): 
+    def __init__(self,problem): 
         self.problem = problem
         root = SearchNode(problem.initial, None)
         self.open_nodes = [root]
-        self.strategy = strategy
         self.length = 0
         self.cost = 0       # 1.9
 
