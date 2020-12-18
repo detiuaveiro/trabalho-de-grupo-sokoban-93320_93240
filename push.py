@@ -149,7 +149,7 @@ class Push(SearchDomain):
                         box = b
             dist[box] = (min_dist,g)   
      
-        return (sum(n for _, n in dist) + len(goals))**2
+        return (sum(n for _, n in dist) + len(goals)**3)**2
         # + len(goals)**2
 
     def satisfies(self, state, goal):
